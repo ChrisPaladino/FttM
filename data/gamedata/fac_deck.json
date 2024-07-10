@@ -1,0 +1,9 @@
+{
+  "deck": [
+    {
+      "move_type": "Agile",
+      "points": "3",
+      "wrestler_in_control": false
+    }
+  ]
+}

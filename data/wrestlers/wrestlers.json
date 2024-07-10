@@ -1,0 +1,38 @@
+{
+  "wrestlers": [
+    {
+      "name": "The Rock",
+      "tv_grade": "A",
+      "grudge_grade": 5,
+      "skills": {
+        "POWERFUL": "star",
+        "FAVORITE": "star",
+        "SMART": "circle"
+      },
+      "finisher": "Rock Bottom"
+    },
+    {
+      "name": "Stone Cold Steve Austin",
+      "tv_grade": "A",
+      "grudge_grade": 6,
+      "skills": {
+        "MEAN": "star",
+        "QUICK": "circle",
+        "AGILE": "square"
+      },
+      "finisher": "Stone Cold Stunner"
+    },
+    {
+      "name": "Abadon",
+      "tv_grade": "C",
+      "grudge_grade": 7,
+      "skills": {
+        "STRONG": "star",
+        "HEAVY": "star",
+        "MEAN": "star",
+        "CHEAT": "square"
+      },
+      "finisher":"Headshot Hurricanrana"
+    }
+  ]
+}
