@@ -27,110 +27,109 @@ class Game:
     def __init__(self):
         self.favored_wrestler = None
         self.underdog_wrestler = None
-        self.wrestlers = []
+        self.wrestlers = self.load_wrestlers()
         self.deck = []
         self.discard_pile = []
-        self.hot_box = {}
+        self.current_card = None
         self.wrestler_in_control = None
-        self.load_wrestlers()
-        self.load_deck()
-
-    def load_wrestlers(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        wrestler_file = os.path.join(current_dir, '..', 'data', 'wrestlers', 'wrestlers.json')
-        with open(wrestler_file, 'r') as f:
-            data = json.load(f)
-            self.wrestlers = [Wrestler(**w) for w in data['wrestlers']]
-
-    def load_deck(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        deck_file = os.path.join(current_dir, '..', 'data', 'gamedata', 'fac_deck.json')
-        with open(deck_file, 'r') as f:
-            data = json.load(f)
-            self.deck = [Card(**c) for c in data['deck']]
-
-    def setup_game(self):
-        self.favored_wrestler, self.underdog_wrestler = random.sample(self.wrestlers, 2)
-        self.wrestler_in_control = random.choice([self.favored_wrestler, self.underdog_wrestler])
-        self.setup_hot_box()
-        self.shuffle_deck()
-
-    def shuffle_deck(self):
-        self.deck.extend(self.discard_pile)
-        self.discard_pile.clear()
-        random.shuffle(self.deck)   
-
-    def setup_hot_box(self):
-        available_wrestlers = [w for w in self.wrestlers if w not in [self.favored_wrestler, self.underdog_wrestler]]
-        roles = ['favored_ally', 'underdog_ally', 'favored_foe', 'underdog_foe', 'high_grudge1', 'high_grudge2']
-        
-        for role in roles:
-            if available_wrestlers:
-                wrestler = random.choice(available_wrestlers)
-                self.hot_box[role] = wrestler
-                available_wrestlers.remove(wrestler)
-            else:
-                self.hot_box[role] = None
+        self.load_and_shuffle_deck()
 
     def draw_card(self):
         if not self.deck:
-            print("Reshuffling deck...")
-            self.shuffle_deck()
-        return self.deck.pop()
+            print("Deck is empty. Reshuffling discard pile.")
+            self.deck = self.discard_pile
+            self.discard_pile = []
+            random.shuffle(self.deck)
+        
+        if self.deck:
+            card = self.deck.pop(0)
+            self.discard_pile.append(card)
+            return card
+        else:
+            print("Error: No cards available even after reshuffling.")
+            return None
 
-    def is_skill_usable(self, wrestler, skill):
-        skill_type = wrestler.skills.get(skill)
-        if skill_type == 'star':
-            return True
-        elif skill_type == 'circle':
-            return wrestler.position in [0, 1, 2, 3, 4, 6, 8, 10]
-        elif skill_type == 'square':
-            return wrestler.position in [5, 7, 9, 11, 12, 13, 14]
-        return False
+    def load_and_shuffle_deck(self):
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'gamedata', 'fac_deck.json')
+        try:
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            self.deck = [Card(**card) for card in data['deck']]
+            random.shuffle(self.deck)
+        except FileNotFoundError:
+            print(f"Error: fac_deck.json not found at {file_path}")
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in fac_deck.json")
 
-    def apply_hot_box_effect(self, wrestler, card):
-        effect = 0
-        for role, hot_box_wrestler in self.hot_box.items():
-            if hot_box_wrestler and card.move_type in hot_box_wrestler.skills:
-                if (wrestler == self.favored_wrestler and role == 'favored_ally') or \
-                   (wrestler == self.underdog_wrestler and role == 'underdog_ally'):
-                    effect += 1
-                elif (wrestler == self.favored_wrestler and role == 'favored_foe') or \
-                     (wrestler == self.underdog_wrestler and role == 'underdog_foe'):
-                    effect -= 1
-                elif role in ['high_grudge1', 'high_grudge2']:
-                    effect += 1
-        return effect
+    def load_wrestlers(self):
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
+        try:
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            wrestlers = [Wrestler(**w) for w in data['wrestlers']]
+            print(f"Loaded {len(wrestlers)} wrestlers:")
+            for w in wrestlers:
+                print(f"  {w.name}: {w.skills}")
+            return wrestlers
+        except FileNotFoundError:
+            print(f"Error: wrestlers.json not found at {file_path}")
+            return []
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in wrestlers.json")
+            return []
+        
+    def load_deck(self):
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'gamedata', 'fac_deck.json')
+        try:
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            return [Card(**card) for card in data['deck']]
+        except FileNotFoundError:
+            print(f"Error: fac_deck.json not found at {file_path}")
+            return []
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in fac_deck.json")
+            return []
 
-    def resolve_move(self, card, wrestler):
-        if self.is_skill_usable(wrestler, card.move_type):
-            hot_box_effect = self.apply_hot_box_effect(wrestler, card)
-            total_points = card.points + hot_box_effect
-            wrestler.position = min(wrestler.position + total_points, 15)
-            self.wrestler_in_control = wrestler
-            return f"{wrestler.name} performs {random.choice(card.specific_moves)} for {total_points} points!"
-        return f"{wrestler.name} couldn't perform the {card.move_type} move."
+    def move_wrestler(self, wrestler):
+        wrestler.position = min(wrestler.position + self.current_card.points, 15)
+        self.wrestler_in_control = wrestler
+        return f"{wrestler.name} used {self.current_card.move_type} and moved to position {wrestler.position}"
+
+    def resolve_tiebreaker(self):
+        # Implement tiebreaker rules here. For now, we'll use a simple rule:
+        # The wrestler who is behind gets to move. If tied, the underdog moves.
+        if self.favored_wrestler.position < self.underdog_wrestler.position:
+            return self.move_wrestler(self.favored_wrestler)
+        elif self.underdog_wrestler.position < self.favored_wrestler.position:
+            return self.move_wrestler(self.underdog_wrestler)
+        else:
+            return self.move_wrestler(self.underdog_wrestler)
+
+    def setup_game(self):
+        if len(self.wrestlers) < 2:
+            print("Error: Not enough wrestlers to start a game")
+            return
+        self.favored_wrestler, self.underdog_wrestler = random.sample(self.wrestlers, 2)
+        self.wrestler_in_control = random.choice([self.favored_wrestler, self.underdog_wrestler])
+        self.load_and_shuffle_deck()
 
     def play_turn(self):
-            try:
-                card = self.draw_card()
-                result = f"Card drawn: {card.move_type} (Points: {card.points})\n"
-                
-                # Use the card's points to move the wrestler
-                self.wrestler_in_control.position = min(self.wrestler_in_control.position + card.points, 15)
-                
-                result += f"{self.wrestler_in_control.name} uses {card.move_type} and moves to position {self.wrestler_in_control.position}"
-                
-                self.discard_pile.append(card)
-                
-                # Switch control for demonstration
-                self.wrestler_in_control = (self.favored_wrestler 
-                                            if self.wrestler_in_control == self.underdog_wrestler 
-                                            else self.underdog_wrestler)
-                
-                return result, card  # Return both the result and the card
-            except Exception as e:
-                return f"An error occurred: {str(e)}", None
+        self.current_card = self.draw_card()
+        if not self.current_card:
+            return "No cards available. Game cannot continue."
+        
+        favored_has_skill = self.current_card.move_type.lower() in [skill.lower() for skill in self.favored_wrestler.skills]
+        underdog_has_skill = self.current_card.move_type.lower() in [skill.lower() for skill in self.underdog_wrestler.skills]
+        
+        if favored_has_skill and underdog_has_skill:
+            return self.resolve_tiebreaker()
+        elif favored_has_skill:
+            return self.move_wrestler(self.favored_wrestler)
+        elif underdog_has_skill:
+            return self.move_wrestler(self.underdog_wrestler)
+        else:
+            return f"Card drawn: {self.current_card.move_type}. Neither wrestler has this skill. No movement."
 
     def check_win_condition(self):
-        return self.favored_wrestler.position == 15 or self.underdog_wrestler.position == 15
+        return self.favored_wrestler.position >= 15 or self.underdog_wrestler.position >= 15
