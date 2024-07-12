@@ -1,9 +1,54 @@
 {
   "deck": [
     {
-      "move_type": "Agile",
-      "points": "3",
-      "wrestler_in_control": false
+      "move_type": "AGILE",
+      "points": 2,
+      "specific_moves": ["Hurricanrana", "Moonsault", "Springboard Attack", "Suicide Dive", "Backflip Kick", "Cartwheel Evasion"]
+    },
+    {
+      "move_type": "CHEAT",
+      "points": 1,
+      "specific_moves": ["Low Blow", "Eye Poke", "Use the Ropes", "Foreign Object", "Distract Referee", "Fake Injury"]
+    },
+    {
+      "move_type": "TV MOVE",
+      "points": 0,
+      "specific_moves": ["Signature Taunt", "Crowd Interaction", "Camera Close-up", "Dramatic Gesture", "Catchphrase", "Showboating"]
+    },
+    {
+      "move_type": "HEAVY",
+      "points": 2,
+      "specific_moves": ["Body Slam", "Bear Hug", "Squash in Corner", "Sit-down Splash", "Avalanche", "Bearhug Slam"]
+    },
+    {
+      "move_type": "MEAN",
+      "points": 2,
+      "specific_moves": ["Bite", "Eye Rake", "Hair Pull", "Finger Bend", "Throat Chop", "Closed Fist Punch"]
+    },
+    {
+      "move_type": "POWERFUL",
+      "points": 3,
+      "specific_moves": ["Powerbomb", "Suplex", "Gorilla Press", "Spine Buster", "Fall Away Slam", "Military Press"]
+    },
+    {
+      "move_type": "QUICK",
+      "points": 1,
+      "specific_moves": ["Dropkick", "Arm Drag", "Enzuigiri", "Spinning Heel Kick", "Leapfrog", "Roll-up Pin"]
+    },
+    {
+      "move_type": "SMART",
+      "points": 2,
+      "specific_moves": ["Counter Move", "Rope Break", "Leverage Pin", "Tactical Retreat", "Exploit Weakness", "Ring Awareness"]
+    },
+    {
+      "move_type": "GRUDGE",
+      "points": 0,
+      "specific_moves": ["Personal Insult", "Mimic Opponent", "Use Rival's Move", "Target Injury", "Disrespectful Pin", "Destroy Personal Item"]
+    },
+    {
+      "move_type": "WILD CARD",
+      "points": 0,
+      "specific_moves": ["Unexpected Event", "Crowd Interference", "Manager Distraction", "Equipment Malfunction", "Surprise Ally", "Rival Appearance"]
     }
   ]
 }
