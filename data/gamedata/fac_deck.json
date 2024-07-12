@@ -3,12 +3,26 @@
     {
       "move_type": "AGILE",
       "points": 2,
-      "specific_moves": ["Hurricanrana", "Moonsault", "Springboard Attack", "Suicide Dive", "Backflip Kick", "Cartwheel Evasion"]
+      "specific_moves": ["Hurricanrana", "Moonsault", "Springboard Attack", "Suicide Dive", "Backflip Kick", "Cartwheel Evasion"],
+      "wrestler_in_control": false
+    },
+    {
+      "move_type": "AGILE",
+      "points": 2,
+      "specific_moves": ["Hurricanrana", "Moonsault", "Springboard Attack", "Suicide Dive", "Backflip Kick", "Cartwheel Evasion"],
+      "wrestler_in_control": true
     },
     {
       "move_type": "CHEAT",
       "points": 1,
-      "specific_moves": ["Low Blow", "Eye Poke", "Use the Ropes", "Foreign Object", "Distract Referee", "Fake Injury"]
+      "specific_moves": ["Low Blow", "Eye Poke", "Use the Ropes", "Foreign Object", "Distract Referee", "Fake Injury"],
+      "wrestler_in_control": true
+    },
+    {
+      "move_type": "CHEAT",
+      "points": 1,
+      "specific_moves": ["Low Blow", "Eye Poke", "Use the Ropes", "Foreign Object", "Distract Referee", "Fake Injury"],
+      "wrestler_in_control": false
     },
     {
       "move_type": "TV MOVE",

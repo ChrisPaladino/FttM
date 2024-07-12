@@ -18,10 +18,11 @@ class Wrestler:
         self.position = 0
 
 class Card:
-    def __init__(self, move_type, points, specific_moves):
+    def __init__(self, move_type, points, specific_moves, wrestler_in_control=False):
         self.move_type = move_type
         self.points = points
         self.specific_moves = specific_moves
+        self.wrestler_in_control = wrestler_in_control
 
 class Game:
     def __init__(self):
@@ -96,6 +97,17 @@ class Game:
         self.wrestler_in_control = wrestler
         return f"{wrestler.name} used {self.current_card.move_type} and moved to position {wrestler.position}"
 
+    def resolve_wrestler_in_control(self):
+        if self.wrestler_in_control.skills.get(self.current_card.move_type.lower()):
+            return self.move_wrestler(self.wrestler_in_control)
+        else:
+            opponent = self.favored_wrestler if self.wrestler_in_control == self.underdog_wrestler else self.underdog_wrestler
+            if opponent.skills.get(self.current_card.move_type.lower()):
+                return self.move_wrestler(opponent)
+            else:
+                self.wrestler_in_control = opponent
+                return f"Control switched to {opponent.name}. No movement."
+
     def resolve_tiebreaker(self):
         # Implement tiebreaker rules here. For now, we'll use a simple rule:
         # The wrestler who is behind gets to move. If tied, the underdog moves.
@@ -118,6 +130,9 @@ class Game:
         self.current_card = self.draw_card()
         if not self.current_card:
             return "No cards available. Game cannot continue."
+        
+        if self.current_card.wrestler_in_control:
+            return self.resolve_wrestler_in_control()
         
         favored_has_skill = self.current_card.move_type.lower() in [skill.lower() for skill in self.favored_wrestler.skills]
         underdog_has_skill = self.current_card.move_type.lower() in [skill.lower() for skill in self.underdog_wrestler.skills]
