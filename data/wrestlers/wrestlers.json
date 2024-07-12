@@ -1,38 +1,105 @@
 {
   "wrestlers": [
     {
-      "name": "The Rock",
-      "tv_grade": "A",
-      "grudge_grade": 5,
-      "skills": {
-        "POWERFUL": "star",
-        "FAVORITE": "star",
-        "SMART": "circle"
-      },
-      "finisher": "Rock Bottom"
-    },
-    {
-      "name": "Stone Cold Steve Austin",
-      "tv_grade": "A",
+      "name": "Penelope Ford",
+      "sex": "Female",
+      "height": "5'4\"",
+      "weight": "119",
+      "hometown": "Philadelphia, PA",
+      "tv_grade": "B",
       "grudge_grade": 6,
       "skills": {
-        "MEAN": "star",
-        "QUICK": "circle",
-        "AGILE": "square"
+        "Mean": "STAR",
+        "Helped": "SQUARE",
+        "Cheat": "STAR",
+        "Favorite": "STAR",
+        "Agile": "CIRCLE",
+        "Smart": "STAR"
       },
-      "finisher": "Stone Cold Stunner"
+      "specialty": {
+        "name": "Handspring Back Elbow",
+        "points": "3",
+        "type": "STAR"
+      },
+      "finisher": {
+        "name": "Stunner",
+        "range": "11-36"
+      },
+      "image": "placeholder.png"
+    },
+    {
+      "name": "Brit Baker",
+      "sex": "Female",
+      "height": "5'7\"",
+      "weight": "121",
+      "hometown": "Punxsutawney, PA",
+      "tv_grade": "A",
+      "grudge_grade": 10,
+      "skills": {
+        "Mean": "STAR",
+        "Helped": "SQUARE",
+        "Cheat": "STAR",
+        "Favorite": "STAR",
+        "Agile": "CIRCLE",
+        "Smart": "STAR"
+      },
+      "specialty": {
+        "name": "Baker Buster",
+        "points": "4",
+        "type": "STAR"
+      },
+      "finisher": {
+        "name": "Lockjaw Submission",
+        "range": "11-43"
+      },
+      "image": "placeholder.png"
     },
     {
       "name": "Abadon",
+      "sex": "Female",
+      "height": "5'1\"",
+      "weight": "141",
+      "hometown": "The Black Hills",
       "tv_grade": "C",
       "grudge_grade": 7,
       "skills": {
-        "STRONG": "star",
-        "HEAVY": "star",
-        "MEAN": "star",
-        "CHEAT": "square"
+        "Mean": "STAR",
+        "Cheat": "SQUARE",
+        "Strong": "STAR",
+        "Heavy": "STAR"
       },
-      "finisher":"Headshot Hurricanrana"
+      "specialty": {
+        "name": "Cemetary Drive",
+        "points": "2",
+        "type": "STAR"
+      },
+      "finisher": {
+        "name": "Headshot Hurricanrana",
+        "range": "11-26"
+      },
+      "image": "placeholder.png"
+    },
+    {
+      "name": "Sanguine",
+      "sex": "Female",
+      "height": "5'3\"",
+      "weight": "128",
+      "hometown": "San Francisco, CA",
+      "tv_grade": "C",
+      "grudge_grade": 3,
+      "skills": {
+        "Powerful": "Star"
+      },
+      "specialty": {
+        "name": "Looking Up",
+        "points": "2",
+        "type": "STAR"
+      },
+      "finisher": {
+        "name": "Jumping Blood Fireball",
+        "range": "11-31"
+      },
+      "image": "placeholder.png"
     }
   ]
 }
