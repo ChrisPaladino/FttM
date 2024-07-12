@@ -3,12 +3,18 @@ import json
 import os
 
 class Wrestler:
-    def __init__(self, name, tv_grade, grudge_grade, skills, finisher):
+    def __init__(self, name="", sex="Male", height="", weight="", hometown="", tv_grade="C", grudge_grade=0, skills={}, specialty={}, finisher={}, image="placeholder.png"):
         self.name = name
+        self.sex = sex
+        self.height = height
+        self.weight = weight
+        self.hometown = hometown
         self.tv_grade = tv_grade
         self.grudge_grade = grudge_grade
         self.skills = skills
-        self.finisher = finisher
+        self.specialty = specialty or {"name": "", "points": "", "type": "star"}
+        self.finisher = finisher or {"name": "", "range": ""}
+        self.image = image
         self.position = 0
 
 class Card:

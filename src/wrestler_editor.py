@@ -21,7 +21,7 @@ class WrestlerEditor:
     def __init__(self, master):
         self.master = master
         self.master.title("Wrestler Editor")
-        self.master.geometry("1200x600")  # Make the window wider
+        self.master.geometry("1200x600")
         self.wrestlers = self.load_wrestlers()
         self.current_wrestler = None
         
@@ -204,7 +204,7 @@ class WrestlerEditor:
         skill = self.skill_var.get()
         skill_type = self.skill_type_var.get()
         if skill and skill_type:
-            self.current_wrestler.skills[skill] = skill_type
+            self.current_wrestler.skills[skill] = skill_type.lower()
             self.skills_listbox.insert(tk.END, f"{skill}: {skill_type.capitalize()}")
 
     def remove_skill(self):
@@ -226,7 +226,7 @@ class WrestlerEditor:
             self.current_wrestler.grudge_grade = int(self.grudge_grade_var.get())
             self.current_wrestler.specialty["name"] = self.specialty_name_var.get()
             self.current_wrestler.specialty["points"] = self.specialty_points_var.get()
-            self.current_wrestler.specialty["type"] = "Star"
+            self.current_wrestler.specialty["type"] = "star"
             self.current_wrestler.finisher["name"] = self.finisher_name_var.get()
             self.current_wrestler.finisher["range"] = self.finisher_range_var.get()
             self.update_wrestler_list()
