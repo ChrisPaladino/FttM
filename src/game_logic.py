@@ -32,8 +32,11 @@ class Game:
         self.deck = []
         self.discard_pile = []
         self.current_card = None
-        self.wrestler_in_control = None
+        self.last_scorer = None
         self.load_and_shuffle_deck()
+
+    def check_win_condition(self):
+        return self.favored_wrestler.position >= 15 or self.underdog_wrestler.position >= 15
 
     def draw_card(self):
         if not self.deck:
@@ -62,6 +65,19 @@ class Game:
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON in fac_deck.json")
 
+    def load_deck(self):
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'gamedata', 'fac_deck.json')
+        try:
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+            return [Card(**card) for card in data['deck']]
+        except FileNotFoundError:
+            print(f"Error: fac_deck.json not found at {file_path}")
+            return []
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON in fac_deck.json")
+            return []
+
     def load_wrestlers(self):
         file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
         try:
@@ -78,73 +94,67 @@ class Game:
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON in wrestlers.json")
             return []
-        
-    def load_deck(self):
-        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'gamedata', 'fac_deck.json')
-        try:
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-            return [Card(**card) for card in data['deck']]
-        except FileNotFoundError:
-            print(f"Error: fac_deck.json not found at {file_path}")
-            return []
-        except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in fac_deck.json")
-            return []
 
-    def move_wrestler(self, wrestler):
-        wrestler.position = min(wrestler.position + self.current_card.points, 15)
-        self.wrestler_in_control = wrestler
-        return f"{wrestler.name} used {self.current_card.move_type} and moved to position {wrestler.position}"
-
-    def resolve_wrestler_in_control(self):
-        if self.wrestler_in_control.skills.get(self.current_card.move_type.lower()):
-            return self.move_wrestler(self.wrestler_in_control)
-        else:
-            opponent = self.favored_wrestler if self.wrestler_in_control == self.underdog_wrestler else self.underdog_wrestler
-            if opponent.skills.get(self.current_card.move_type.lower()):
-                return self.move_wrestler(opponent)
-            else:
-                self.wrestler_in_control = opponent
-                return f"Control switched to {opponent.name}. No movement."
-
-    def resolve_tiebreaker(self):
-        # Implement tiebreaker rules here. For now, we'll use a simple rule:
-        # The wrestler who is behind gets to move. If tied, the underdog moves.
-        if self.favored_wrestler.position < self.underdog_wrestler.position:
-            return self.move_wrestler(self.favored_wrestler)
-        elif self.underdog_wrestler.position < self.favored_wrestler.position:
-            return self.move_wrestler(self.underdog_wrestler)
-        else:
-            return self.move_wrestler(self.underdog_wrestler)
-
-    def setup_game(self):
-        if len(self.wrestlers) < 2:
-            print("Error: Not enough wrestlers to start a game")
-            return
-        self.favored_wrestler, self.underdog_wrestler = random.sample(self.wrestlers, 2)
-        self.wrestler_in_control = random.choice([self.favored_wrestler, self.underdog_wrestler])
-        self.load_and_shuffle_deck()
+    def move_wrestler(self, wrestler, card):
+        wrestler.position = min(wrestler.position + card.points, 15)
+        self.last_scorer = wrestler
+        return f"{wrestler.name} used {card.move_type} and moved to position {wrestler.position}"
 
     def play_turn(self):
         self.current_card = self.draw_card()
         if not self.current_card:
             return "No cards available. Game cannot continue."
         
-        if self.current_card.wrestler_in_control:
-            return self.resolve_wrestler_in_control()
+        result = self.resolve_card(self.current_card)
         
-        favored_has_skill = self.current_card.move_type.lower() in [skill.lower() for skill in self.favored_wrestler.skills]
-        underdog_has_skill = self.current_card.move_type.lower() in [skill.lower() for skill in self.underdog_wrestler.skills]
+        if self.check_win_condition():
+            winner = self.favored_wrestler if self.favored_wrestler.position >= 15 else self.underdog_wrestler
+            result += f" {winner.name} wins the match!"
+        
+        return result
+
+    def resolve_card(self, card):
+        favored_has_skill = card.move_type.lower() in [skill.lower() for skill in self.favored_wrestler.skills]
+        underdog_has_skill = card.move_type.lower() in [skill.lower() for skill in self.underdog_wrestler.skills]
+        
+        if card.wrestler_in_control:
+            return self.resolve_wrestler_in_control(card, favored_has_skill, underdog_has_skill)
         
         if favored_has_skill and underdog_has_skill:
-            return self.resolve_tiebreaker()
+            return self.resolve_tiebreaker(card)
         elif favored_has_skill:
-            return self.move_wrestler(self.favored_wrestler)
+            return self.move_wrestler(self.favored_wrestler, card)
         elif underdog_has_skill:
-            return self.move_wrestler(self.underdog_wrestler)
+            return self.move_wrestler(self.underdog_wrestler, card)
         else:
-            return f"Card drawn: {self.current_card.move_type}. Neither wrestler has this skill. No movement."
+            return f"Card drawn: {card.move_type}. Neither wrestler has this skill. No movement."
 
-    def check_win_condition(self):
-        return self.favored_wrestler.position >= 15 or self.underdog_wrestler.position >= 15
+    def resolve_tiebreaker(self, card):
+        if self.favored_wrestler.position < self.underdog_wrestler.position:
+            return self.move_wrestler(self.favored_wrestler, card)
+        elif self.underdog_wrestler.position < self.favored_wrestler.position:
+            return self.move_wrestler(self.underdog_wrestler, card)
+        else:
+            return self.move_wrestler(self.underdog_wrestler, card)  # Underdog wins ties
+
+    def resolve_wrestler_in_control(self, card, favored_has_skill, underdog_has_skill):
+        if self.last_scorer:
+            if (self.last_scorer == self.favored_wrestler and favored_has_skill) or \
+               (self.last_scorer == self.underdog_wrestler and underdog_has_skill):
+                return self.move_wrestler(self.last_scorer, card)
+            else:
+                new_card = self.draw_card()
+                opponent = self.underdog_wrestler if self.last_scorer == self.favored_wrestler else self.favored_wrestler
+                if new_card.move_type.lower() in [skill.lower() for skill in opponent.skills]:
+                    return self.move_wrestler(opponent, new_card)
+                else:
+                    return f"Neither wrestler could use the In-Control exchange. Play continues."
+        else:
+            return self.resolve_card(card)  # Treat as a normal card if no last scorer
+        
+    def setup_game(self):
+        if len(self.wrestlers) < 2:
+            print("Error: Not enough wrestlers to start a game")
+            return
+        self.favored_wrestler, self.underdog_wrestler = random.sample(self.wrestlers, 2)
+        self.load_and_shuffle_deck()
