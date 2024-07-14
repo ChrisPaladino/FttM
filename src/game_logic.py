@@ -2,16 +2,12 @@ import random
 import json
 import os
 
-class Game:
-    def __init__(self):
-        self.favored_wrestler = None
-        self.underdog_wrestler = None
-        self.wrestlers = self.load_wrestlers()
-        self.deck = []
-        self.discard_pile = []
-        self.current_card = None
-        self.last_scorer = None
-        self.load_and_shuffle_deck()
+class Card:
+    def __init__(self, move_type, points, specific_moves, wrestler_in_control=False):
+        self.move_type = move_type
+        self.points = points
+        self.specific_moves = specific_moves
+        self.wrestler_in_control = wrestler_in_control
 
 class Game:
     def __init__(self):
@@ -47,7 +43,7 @@ class Game:
         try:
             with open(file_path, 'r') as f:
                 data = json.load(f)
-            self.deck = [Card(**card) for card in data['deck']]
+            self.deck = [Card(card['move_type'], card['points'], card['specific_moves'], card.get('wrestler_in_control', False)) for card in data['deck']]
             random.shuffle(self.deck)
         except FileNotFoundError:
             print(f"Error: fac_deck.json not found at {file_path}")
@@ -61,11 +57,7 @@ class Game:
         try:
             with open(file_path, 'r') as f:
                 data = json.load(f)
-            wrestlers = [Wrestler(**w) for w in data['wrestlers']]
-            print(f"Loaded {len(wrestlers)} wrestlers:")
-            for w in wrestlers:
-                print(f"  {w.name}: {w.skills}")
-            return wrestlers
+            return [Wrestler(**w) for w in data['wrestlers']]
         except FileNotFoundError:
             print(f"Error: wrestlers.json not found at {file_path}")
             return []
@@ -83,7 +75,7 @@ class Game:
         if not self.current_card:
             return "No cards available. Game cannot continue."
         
-        result = f"Card drawn: {self.current_card.move_type} (Points: {self.current_card.points}, In-Control: {'Yes' if self.current_card.wrestler_in_control else 'No'})\n"
+        result = ""
         result += self.resolve_card(self.current_card)
         
         if self.check_win_condition():
@@ -95,9 +87,8 @@ class Game:
     def resolve_card(self, card):
         favored_has_skill = card.move_type.lower() in [skill.lower() for skill in self.favored_wrestler.skills]
         underdog_has_skill = card.move_type.lower() in [skill.lower() for skill in self.underdog_wrestler.skills]
-        
-        result = f"Favored wrestler ({self.favored_wrestler.name}) has skill: {favored_has_skill}\n"
-        result += f"Underdog wrestler ({self.underdog_wrestler.name}) has skill: {underdog_has_skill}\n"
+
+        result = ""  
         
         if card.wrestler_in_control:
             result += self.resolve_wrestler_in_control(card, favored_has_skill, underdog_has_skill)
