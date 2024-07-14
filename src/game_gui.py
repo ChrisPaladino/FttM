@@ -7,6 +7,14 @@ class GameGUI:
         self.game = game
         self.setup_gui()
 
+    def play_turn(self):
+        result = self.game.play_turn()
+        self.result_label.config(text=result)
+        self.update_display()
+        
+        if self.game.check_win_condition():
+            self.action_button.config(state="disabled")
+
     def setup_gui(self):
         self.master.title("Face to the Mat")
         self.master.geometry("1200x900")  # Increased height to accommodate card display
@@ -36,14 +44,35 @@ class GameGUI:
         self.result_label = ttk.Label(self.master, text="", wraplength=780)
         self.result_label.grid(row=4, column=0, columnspan=2, pady=10)
 
+        # Add a label for Last Scorer
+        self.last_scorer_label = ttk.Label(self.master, text="No last scorer")
+        self.last_scorer_label.grid(row=5, column=0, columnspan=2, pady=10)
+
         self.update_display()
+
+    def update_board(self):
+        self.board_canvas.delete("all")
+        for i in range(16):
+            x = i * 50
+            y = 100
+            if i in [5, 7, 9, 11, 12, 13, 14]:  # Square spaces
+                self.board_canvas.create_rectangle(x, y-20, x+40, y+20, fill="lightblue")
+            else:  # Circle spaces
+                self.board_canvas.create_oval(x, y-20, x+40, y+20, fill="lightgreen")
+            if i >= 12:  # PIN spaces
+                self.board_canvas.create_text(x+20, y+30, text="PIN")
+
+        favored_x = self.game.favored_wrestler.position * 50
+        underdog_x = self.game.underdog_wrestler.position * 50
+        self.board_canvas.create_oval(favored_x, 60, favored_x+40, 100, fill="red")
+        self.board_canvas.create_oval(underdog_x, 100, underdog_x+40, 140, fill="blue")
 
     def update_card_display(self):
         if self.game.current_card:
             card = self.game.current_card
             card_text = f"Move Type: {card.move_type}\n"
             card_text += f"Points: {card.points}\n"
-            card_text += f"Specific Moves: {', '.join(card.specific_moves)}"
+            card_text += f"In-Control: {'Yes' if card.wrestler_in_control else 'No'}"
             self.card_label.config(text=card_text)
         else:
             self.card_label.config(text="No card drawn yet")
@@ -53,6 +82,9 @@ class GameGUI:
         self.update_wrestler_info(self.underdog_frame, self.game.underdog_wrestler)
         self.update_board()
         self.update_card_display()
+        
+        last_scorer_text = f"Last Scorer: {self.game.last_scorer.name}" if self.game.last_scorer else "No last scorer"
+        self.last_scorer_label.config(text=last_scorer_text)
 
     def update_wrestler_info(self, frame, wrestler):
         for widget in frame.winfo_children():
@@ -73,30 +105,3 @@ class GameGUI:
 
         ttk.Label(frame, text=f"Specialty: {wrestler.specialty['name']} ({wrestler.specialty['points']})").grid(row=i+1, column=0, sticky="w")
         ttk.Label(frame, text=f"Finisher: {wrestler.finisher['name']} ({wrestler.finisher['range']})").grid(row=i+2, column=0, sticky="w")
-
-    def update_board(self):
-        self.board_canvas.delete("all")
-        for i in range(16):
-            x = i * 50
-            y = 100
-            if i in [5, 7, 9, 11, 12, 13, 14]:  # Square spaces
-                self.board_canvas.create_rectangle(x, y-20, x+40, y+20, fill="lightblue")
-            else:  # Circle spaces
-                self.board_canvas.create_oval(x, y-20, x+40, y+20, fill="lightgreen")
-            if i >= 12:  # PIN spaces
-                self.board_canvas.create_text(x+20, y+30, text="PIN")
-
-        favored_x = self.game.favored_wrestler.position * 50
-        underdog_x = self.game.underdog_wrestler.position * 50
-        self.board_canvas.create_oval(favored_x, 60, favored_x+40, 100, fill="red")
-        self.board_canvas.create_oval(underdog_x, 100, underdog_x+40, 140, fill="blue")
-
-    def play_turn(self):
-        result = self.game.play_turn()
-        self.result_label.config(text=result)
-        self.update_display()
-        
-        if self.game.check_win_condition():
-            self.action_button.config(state="disabled")
-            winner = self.game.favored_wrestler if self.game.favored_wrestler.position >= 15 else self.game.underdog_wrestler
-            self.result_label.config(text=f"Game Over! {winner.name} wins!")
