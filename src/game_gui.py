@@ -17,55 +17,79 @@ class GameGUI:
 
     def setup_gui(self):
         self.master.title("Face to the Mat")
-        self.master.geometry("1200x900")  # Increased height to accommodate card display
+        self.master.geometry("1000x600")
 
-        # Wrestler info frames
-        self.favored_frame = ttk.LabelFrame(self.master, text="Favored Wrestler", padding="10")
-        self.favored_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        # Main frame
+        main_frame = ttk.Frame(self.master, padding="10")
+        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.columnconfigure(0, weight=1)
+        main_frame.columnconfigure(1, weight=1)
+        main_frame.columnconfigure(2, weight=1)
+        main_frame.rowconfigure(0, weight=1)
 
-        self.underdog_frame = ttk.LabelFrame(self.master, text="Underdog Wrestler", padding="10")
-        self.underdog_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        # Left column: Wrestler selection and info
+        left_frame = ttk.Frame(main_frame, padding="5")
+        left_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-        # Game board
-        self.board_canvas = tk.Canvas(self.master, width=800, height=200)
-        self.board_canvas.grid(row=1, column=0, columnspan=2, pady=10)
+        ttk.Label(left_frame, text="Favored Wrestler:").grid(row=0, column=0, sticky=tk.W)
+        self.favored_var = tk.StringVar()
+        self.favored_dropdown = ttk.Combobox(left_frame, textvariable=self.favored_var)
+        self.favored_dropdown.grid(row=0, column=1, sticky=(tk.W, tk.E))
+        self.favored_dropdown.bind("<<ComboboxSelected>>", self.update_favored_wrestler)
 
-        # Card display
-        self.card_frame = ttk.LabelFrame(self.master, text="Current Card", padding="10")
-        self.card_frame.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        ttk.Label(left_frame, text="Underdog Wrestler:").grid(row=1, column=0, sticky=tk.W)
+        self.underdog_var = tk.StringVar()
+        self.underdog_dropdown = ttk.Combobox(left_frame, textvariable=self.underdog_var)
+        self.underdog_dropdown.grid(row=1, column=1, sticky=(tk.W, tk.E))
+        self.underdog_dropdown.bind("<<ComboboxSelected>>", self.update_underdog_wrestler)
+
+        self.wrestler_info = ttk.Label(left_frame, text="", justify=tk.LEFT)
+        self.wrestler_info.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.N))
+
+        # Middle column: Game controls and card info
+        middle_frame = ttk.Frame(main_frame, padding="5")
+        middle_frame.grid(row=0, column=1, sticky=(tk.W, tk.E, tk.N, tk.S))
+
+        self.action_button = ttk.Button(middle_frame, text="PLAY TURN", command=self.play_turn)
+        self.action_button.pack(pady=(0, 10))
+
+        self.card_frame = ttk.LabelFrame(middle_frame, text="Current Card", padding="5")
+        self.card_frame.pack(fill=tk.X, expand=True)
         self.card_label = ttk.Label(self.card_frame, text="No card drawn yet")
         self.card_label.pack()
 
-        # Action button
-        self.action_button = ttk.Button(self.master, text="Play Turn", command=self.play_turn)
-        self.action_button.grid(row=3, column=0, columnspan=2, pady=10)
+        self.result_label = ttk.Label(middle_frame, text="", wraplength=200)
+        self.result_label.pack(pady=5)
 
-        # Result display
-        self.result_label = ttk.Label(self.master, text="", wraplength=780)
-        self.result_label.grid(row=4, column=0, columnspan=2, pady=10)
+        # Right column: Game board
+        right_frame = ttk.Frame(main_frame, padding="5")
+        right_frame.grid(row=0, column=2, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-        # Add a label for Last Scorer
-        self.last_scorer_label = ttk.Label(self.master, text="No last scorer")
-        self.last_scorer_label.grid(row=5, column=0, columnspan=2, pady=10)
+        self.board_canvas = tk.Canvas(right_frame, width=100, height=400)
+        self.board_canvas.pack(fill=tk.BOTH, expand=True)
 
+        self.update_wrestler_dropdowns()
         self.update_display()
 
     def update_board(self):
         self.board_canvas.delete("all")
+        space_height = 25
         for i in range(16):
-            x = i * 50
-            y = 100
+            y = i * space_height
             if i in [5, 7, 9, 11, 12, 13, 14]:  # Square spaces
-                self.board_canvas.create_rectangle(x, y-20, x+40, y+20, fill="lightblue")
+                self.board_canvas.create_rectangle(0, y, 80, y+space_height, fill="lightblue")
             else:  # Circle spaces
-                self.board_canvas.create_oval(x, y-20, x+40, y+20, fill="lightgreen")
+                self.board_canvas.create_oval(0, y, 80, y+space_height, fill="lightgreen")
+            self.board_canvas.create_text(90, y+space_height/2, text=str(i))
             if i >= 12:  # PIN spaces
-                self.board_canvas.create_text(x+20, y+30, text="PIN")
+                self.board_canvas.create_text(40, y+space_height/2, text="PIN")
 
-        favored_x = self.game.favored_wrestler.position * 50
-        underdog_x = self.game.underdog_wrestler.position * 50
-        self.board_canvas.create_oval(favored_x, 60, favored_x+40, 100, fill="red")
-        self.board_canvas.create_oval(underdog_x, 100, underdog_x+40, 140, fill="blue")
+        if self.game.favored_wrestler:
+            favored_y = self.game.favored_wrestler.position * space_height + space_height/2
+            self.board_canvas.create_oval(5, favored_y-10, 25, favored_y+10, fill="red")
+        if self.game.underdog_wrestler:
+            underdog_y = self.game.underdog_wrestler.position * space_height + space_height/2
+            self.board_canvas.create_oval(55, underdog_y-10, 75, underdog_y+10, fill="blue")
 
     def update_card_display(self):
         if self.game.current_card:
@@ -78,30 +102,37 @@ class GameGUI:
             self.card_label.config(text="No card drawn yet")
 
     def update_display(self):
-        self.update_wrestler_info(self.favored_frame, self.game.favored_wrestler)
-        self.update_wrestler_info(self.underdog_frame, self.game.underdog_wrestler)
+        self.update_wrestler_info()
         self.update_board()
         self.update_card_display()
-        
-        last_scorer_text = f"Last Scorer: {self.game.last_scorer.name}" if self.game.last_scorer else "No last scorer"
-        self.last_scorer_label.config(text=last_scorer_text)
 
-    def update_wrestler_info(self, frame, wrestler):
-        for widget in frame.winfo_children():
-            widget.destroy()
+    def update_favored_wrestler(self, event):
+        selected_name = self.favored_var.get()
+        self.game.favored_wrestler = next(w for w in self.game.wrestlers if w.name == selected_name)
+        self.update_display()
 
-        ttk.Label(frame, text=f"Name: {wrestler.name}").grid(row=0, column=0, sticky="w")
-        ttk.Label(frame, text=f"Sex: {wrestler.sex}").grid(row=1, column=0, sticky="w")
-        ttk.Label(frame, text=f"Height: {wrestler.height}").grid(row=2, column=0, sticky="w")
-        ttk.Label(frame, text=f"Weight: {wrestler.weight}").grid(row=3, column=0, sticky="w")
-        ttk.Label(frame, text=f"Hometown: {wrestler.hometown}").grid(row=4, column=0, sticky="w")
-        ttk.Label(frame, text=f"TV Grade: {wrestler.tv_grade}").grid(row=5, column=0, sticky="w")
-        ttk.Label(frame, text=f"Grudge Grade: {wrestler.grudge_grade}").grid(row=6, column=0, sticky="w")
-        ttk.Label(frame, text=f"Position: {wrestler.position}").grid(row=7, column=0, sticky="w")
+    def update_underdog_wrestler(self, event):
+        selected_name = self.underdog_var.get()
+        self.game.underdog_wrestler = next(w for w in self.game.wrestlers if w.name == selected_name)
+        self.update_display()
 
-        ttk.Label(frame, text="Skills:").grid(row=8, column=0, sticky="w")
-        for i, (skill, skill_type) in enumerate(wrestler.skills.items(), start=9):
-            ttk.Label(frame, text=f"  {skill}: {skill_type}").grid(row=i, column=0, sticky="w")
+    def update_wrestler_dropdowns(self):
+        wrestler_names = [w.name for w in self.game.wrestlers]
+        self.favored_dropdown['values'] = wrestler_names
+        self.underdog_dropdown['values'] = wrestler_names
 
-        ttk.Label(frame, text=f"Specialty: {wrestler.specialty['name']} ({wrestler.specialty['points']})").grid(row=i+1, column=0, sticky="w")
-        ttk.Label(frame, text=f"Finisher: {wrestler.finisher['name']} ({wrestler.finisher['range']})").grid(row=i+2, column=0, sticky="w")
+    def update_wrestler_info(self):
+        info_text = ""
+        if self.game.favored_wrestler:
+            info_text += f"Favored: {self.game.favored_wrestler.name}\n"
+            info_text += f"  Position: {self.game.favored_wrestler.position}\n"
+            info_text += f"  TV Grade: {self.game.favored_wrestler.tv_grade}\n"
+            info_text += f"  Grudge Grade: {self.game.favored_wrestler.grudge_grade}\n"
+            info_text += f"  Skills: {', '.join(self.game.favored_wrestler.skills)}\n\n"
+        if self.game.underdog_wrestler:
+            info_text += f"Underdog: {self.game.underdog_wrestler.name}\n"
+            info_text += f"  Position: {self.game.underdog_wrestler.position}\n"
+            info_text += f"  TV Grade: {self.game.underdog_wrestler.tv_grade}\n"
+            info_text += f"  Grudge Grade: {self.game.underdog_wrestler.grudge_grade}\n"
+            info_text += f"  Skills: {', '.join(self.game.underdog_wrestler.skills)}\n"
+        self.wrestler_info.config(text=info_text)

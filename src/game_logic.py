@@ -2,12 +2,16 @@ import random
 import json
 import os
 
-class Card:
-    def __init__(self, move_type, points, specific_moves, wrestler_in_control=False):
-        self.move_type = move_type
-        self.points = points
-        self.specific_moves = specific_moves
-        self.wrestler_in_control = wrestler_in_control
+class Game:
+    def __init__(self):
+        self.favored_wrestler = None
+        self.underdog_wrestler = None
+        self.wrestlers = self.load_wrestlers()
+        self.deck = []
+        self.discard_pile = []
+        self.current_card = None
+        self.last_scorer = None
+        self.load_and_shuffle_deck()
 
 class Game:
     def __init__(self):
@@ -47,21 +51,10 @@ class Game:
             random.shuffle(self.deck)
         except FileNotFoundError:
             print(f"Error: fac_deck.json not found at {file_path}")
+            self.deck = []
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON in fac_deck.json")
-
-    def load_deck(self):
-        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'gamedata', 'fac_deck.json')
-        try:
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-            return [Card(**card) for card in data['deck']]
-        except FileNotFoundError:
-            print(f"Error: fac_deck.json not found at {file_path}")
-            return []
-        except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in fac_deck.json")
-            return []
+            self.deck = []
 
     def load_wrestlers(self):
         file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
@@ -142,15 +135,21 @@ class Game:
                 else:
                     result += "Neither wrestler could use the In-Control exchange. Play continues."
         else:
-            result += "No last scorer, treating as a normal card.\n"
-            result += self.resolve_card(card)
+            result += "No last scorer, resolving as a normal card.\n"
+            if favored_has_skill and underdog_has_skill:
+                result += self.resolve_tiebreaker(card)
+            elif favored_has_skill:
+                result += self.move_wrestler(self.favored_wrestler, card)
+            elif underdog_has_skill:
+                result += self.move_wrestler(self.underdog_wrestler, card)
+            else:
+                result += "Neither wrestler has this skill. No movement."
         return result
         
     def setup_game(self):
-        if len(self.wrestlers) < 2:
-            print("Error: Not enough wrestlers to start a game")
+        if not self.favored_wrestler or not self.underdog_wrestler:
+            print("Error: Wrestlers not selected")
             return
-        self.favored_wrestler, self.underdog_wrestler = random.sample(self.wrestlers, 2)
         self.load_and_shuffle_deck()
 
 class Wrestler:
