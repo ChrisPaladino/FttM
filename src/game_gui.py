@@ -9,7 +9,7 @@ class GameGUI:
 
     def play_turn(self):
         if not self.game.favored_wrestler or not self.game.underdog_wrestler:
-            self.result_label.config(text="Error: Wrestlers not selected")
+            self.result_label.config(text="Please select wrestlers to begin the game.")
             return
         result = self.game.play_turn()
         self.result_label.config(text=result)
@@ -77,22 +77,23 @@ class GameGUI:
     def update_board(self):
         self.board_canvas.delete("all")
         space_height = 25
+        space_width = 25
         for i in range(16):
             y = i * space_height
             if i in [5, 7, 9, 11, 12, 13, 14]:  # Square spaces
-                self.board_canvas.create_rectangle(0, y, 80, y+space_height, fill="lightblue")
+                self.board_canvas.create_rectangle(2, 2+y, space_width, y+space_height, fill="lightblue")
             else:  # Circle spaces
-                self.board_canvas.create_oval(0, y, 80, y+space_height, fill="lightgreen")
-            self.board_canvas.create_text(90, y+space_height/2, text=str(i))
+                self.board_canvas.create_oval(2, 2+y, space_width, y+space_height, fill="lightgreen")
+            self.board_canvas.create_text(space_width + 10, y+space_height/2, text=str(i))
             if i >= 12:  # PIN spaces
-                self.board_canvas.create_text(40, y+space_height/2, text="PIN")
+                self.board_canvas.create_text(space_width/2, y+space_height/2, text="PIN")
 
         if self.game.favored_wrestler:
             favored_y = self.game.favored_wrestler.position * space_height + space_height/2
-            self.board_canvas.create_oval(5, favored_y-10, 25, favored_y+10, fill="red")
+            self.board_canvas.create_oval(5, favored_y-10, 25, favored_y+10, fill="blue")
         if self.game.underdog_wrestler:
             underdog_y = self.game.underdog_wrestler.position * space_height + space_height/2
-            self.board_canvas.create_oval(55, underdog_y-10, 75, underdog_y+10, fill="blue")
+            self.board_canvas.create_oval(space_width-25, underdog_y-10, space_width-5, underdog_y+10, fill="red")
 
     def update_card_display(self):
         if self.game.current_card:
