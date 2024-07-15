@@ -56,7 +56,7 @@ class Game:
         try:
             with open(file_path, 'r') as f:
                 data = json.load(f)
-            self.deck = [Card(card['move_type'], card['points'], card['specific_moves'], card.get('wrestler_in_control', False)) for card in data['deck']]
+            self.deck = [Card(**card) for card in data['cards']]
             random.shuffle(self.deck)
         except FileNotFoundError:
             print(f"Error: fac_deck.json not found at {file_path}")
@@ -89,7 +89,16 @@ class Game:
             return "No cards available. Game cannot continue."
         
         result = ""
-        result += self.resolve_card(self.current_card)
+        
+        # Determine active wrestler and opponent
+        if self.last_scorer == self.favored_wrestler or (not self.last_scorer and self.current_card.control):
+            active_wrestler = self.favored_wrestler
+            opponent = self.underdog_wrestler
+        else:
+            active_wrestler = self.underdog_wrestler
+            opponent = self.favored_wrestler
+
+        result += self.resolve_card(self.current_card, active_wrestler, opponent)
         
         if self.check_win_condition():
             winner = self.favored_wrestler if self.favored_wrestler.position >= 15 else self.underdog_wrestler
@@ -97,13 +106,14 @@ class Game:
         
         return result
 
-    def resolve_card(card, active_wrestler, opponent):
+    def resolve_card(self, card, active_wrestler, opponent):
+        result = ""
         if card.type == "TV":
             points = card.get_points(active_wrestler.tv_grade)
         elif card.type in ["Wild Card", "Highlight Reel", "Ref Bump", "Test of Strength"]:
-            print(f"{card.type}: {card.text}")
+            result = f"{card.type}: {card.text}"
             # Implement logic for these special cards
-            return
+            return result
         elif card.type == "Grudge":
             points = card.points  # Gold, Silver, or Bronze move
         elif card.type == "Specialty":
@@ -115,9 +125,9 @@ class Game:
                 points = 0
         elif card.type == "Helped":
             if card.text:
-                print(f"Helped: {card.text}")
+                result = f"Helped: {card.text}"
                 # Implement logic for special Helped cards
-                return
+                return result
             else:
                 points = card.points
         elif card.type == "Title Holder":
@@ -131,18 +141,18 @@ class Game:
             else:
                 points = 0
         else:  # Regular skill card
-            if hasattr(active_wrestler, card.type.lower()):
-                points = card.points
+            if active_wrestler.has_skill(card.type):
+                points = card.get_points()
             else:
                 points = 0
 
         if points:
             active_wrestler.score(points)
-            print(f"{active_wrestler.name} scores {points} points with a {card.type} move!")
+            result = f"{active_wrestler.name} scores {points} points with a {card.type} move!"
         else:
-            print(f"{active_wrestler.name} fails to score with the {card.type} card.")
-
-        active_wrestler.last_card_scored = bool(points)
+            result = f"{active_wrestler.name} fails to score with the {card.type} card."
+        
+        return result
 
     def resolve_tiebreaker(self, card):
         if self.favored_wrestler.position < self.underdog_wrestler.position:
@@ -186,7 +196,7 @@ class Game:
         self.load_and_shuffle_deck()
 
 class Wrestler:
-    def __init__(self, name="", sex="Male", height="", weight="", hometown="", tv_grade="C", grudge_grade=0, skills={}, specialty={}, finisher={}, image="placeholder.png"):
+    def __init__(self, name, sex, height, weight, hometown, tv_grade, grudge_grade, skills, specialty, finisher, image="placeholder.png"):
         self.name = name
         self.sex = sex
         self.height = height
@@ -195,12 +205,23 @@ class Wrestler:
         self.tv_grade = tv_grade
         self.grudge_grade = grudge_grade
         self.skills = skills
-        self.specialty = specialty or {"name": "", "points": "", "type": "star"}
-        self.finisher = finisher or {"name": "", "range": ""}
+        self.specialty = specialty
+        self.finisher = finisher
         self.image = image
         self.position = 0
         self.last_card_scored = False
         self.is_title_holder = False  # Set this when appropriate
-    
+
+    def has_skill(self, skill):
+        return skill.lower() in [s.lower() for s in self.skills]
+
     def is_trailing(self, opponent):
-        return self.score < opponent.score
+        return self.position < opponent.position
+    
+    def score(self, points):
+        self.position += points
+        self.position = min(self.position, 15)  # Ensure position doesn't exceed 15
+
+    @property
+    def specialty_points(self):
+        return int(self.specialty.get('points', 0))

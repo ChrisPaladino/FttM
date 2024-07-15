@@ -8,6 +8,9 @@ class GameGUI:
         self.setup_gui()
 
     def play_turn(self):
+        if not self.game.favored_wrestler or not self.game.underdog_wrestler:
+            self.result_label.config(text="Error: Wrestlers not selected")
+            return
         result = self.game.play_turn()
         self.result_label.config(text=result)
         self.update_display()
@@ -94,9 +97,9 @@ class GameGUI:
     def update_card_display(self):
         if self.game.current_card:
             card = self.game.current_card
-            card_text = f"Move Type: {card.move_type}\n"
+            card_text = f"Move Type: {card.type}\n"
             card_text += f"Points: {card.points}\n"
-            card_text += f"In-Control: {'Yes' if card.wrestler_in_control else 'No'}"
+            card_text += f"In-Control: {'Yes' if card.control else 'No'}"
             self.card_label.config(text=card_text)
         else:
             self.card_label.config(text="No card drawn yet")
