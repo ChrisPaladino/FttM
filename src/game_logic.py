@@ -3,11 +3,24 @@ import json
 import os
 
 class Card:
-    def __init__(self, move_type, points, specific_moves, wrestler_in_control=False):
-        self.move_type = move_type
+    def __init__(self, id, control, type, points=None, text=None):
+        self.id = id
+        self.control = control
+        self.type = type
         self.points = points
-        self.specific_moves = specific_moves
-        self.wrestler_in_control = wrestler_in_control
+        self.text = text
+
+    def get_points(self, tv_grade=None):
+        if isinstance(self.points, dict):  # TV card
+            return self.points.get(tv_grade, 0)
+        elif self.points == "d6":
+            return random.randint(1, 6)
+        elif isinstance(self.points, (int, float)):
+            return self.points
+        return 0
+    
+    def __str__(self):
+        return f"Card {self.id}: {self.type} ({'Control' if self.control else 'No Control'})"
 
 class Game:
     def __init__(self):
@@ -84,23 +97,52 @@ class Game:
         
         return result
 
-    def resolve_card(self, card):
-        favored_has_skill = card.move_type.lower() in [skill.lower() for skill in self.favored_wrestler.skills]
-        underdog_has_skill = card.move_type.lower() in [skill.lower() for skill in self.underdog_wrestler.skills]
+    def resolve_card(card, active_wrestler, opponent):
+        if card.type == "TV":
+            points = card.get_points(active_wrestler.tv_grade)
+        elif card.type in ["Wild Card", "Highlight Reel", "Ref Bump", "Test of Strength"]:
+            print(f"{card.type}: {card.text}")
+            # Implement logic for these special cards
+            return
+        elif card.type == "Grudge":
+            points = card.points  # Gold, Silver, or Bronze move
+        elif card.type == "Specialty":
+            points = active_wrestler.specialty_points
+        elif card.type == "Signature":
+            if active_wrestler.last_card_scored:
+                points = card.get_points()
+            else:
+                points = 0
+        elif card.type == "Helped":
+            if card.text:
+                print(f"Helped: {card.text}")
+                # Implement logic for special Helped cards
+                return
+            else:
+                points = card.points
+        elif card.type == "Title Holder":
+            if active_wrestler.is_title_holder:
+                points = card.get_points()
+            else:
+                points = 0
+        elif card.type == "Trailing":
+            if active_wrestler.is_trailing(opponent):
+                points = card.points
+            else:
+                points = 0
+        else:  # Regular skill card
+            if hasattr(active_wrestler, card.type.lower()):
+                points = card.points
+            else:
+                points = 0
 
-        result = ""  
-        
-        if card.wrestler_in_control:
-            result += self.resolve_wrestler_in_control(card, favored_has_skill, underdog_has_skill)
-        elif favored_has_skill and underdog_has_skill:
-            result += self.resolve_tiebreaker(card)
-        elif favored_has_skill:
-            result += self.move_wrestler(self.favored_wrestler, card)
-        elif underdog_has_skill:
-            result += self.move_wrestler(self.underdog_wrestler, card)
+        if points:
+            active_wrestler.score(points)
+            print(f"{active_wrestler.name} scores {points} points with a {card.type} move!")
         else:
-            result += "Neither wrestler has this skill. No movement."
-        return result
+            print(f"{active_wrestler.name} fails to score with the {card.type} card.")
+
+        active_wrestler.last_card_scored = bool(points)
 
     def resolve_tiebreaker(self, card):
         if self.favored_wrestler.position < self.underdog_wrestler.position:
@@ -157,3 +199,8 @@ class Wrestler:
         self.finisher = finisher or {"name": "", "range": ""}
         self.image = image
         self.position = 0
+        self.last_card_scored = False
+        self.is_title_holder = False  # Set this when appropriate
+    
+    def is_trailing(self, opponent):
+        return self.score < opponent.score
