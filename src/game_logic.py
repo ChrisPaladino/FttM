@@ -51,6 +51,11 @@ class Game:
         else:
             print("Error: No cards available even after reshuffling.")
             return None
+        
+    def handle_d6_points(self, wrestler, card):
+        roll = self.roll_d6()
+        wrestler.score(roll)
+        return f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (d6 roll: {roll})"
 
     def load_and_shuffle_deck(self):
         file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'gamedata', 'fac_deck.json')
@@ -81,16 +86,14 @@ class Game:
 
     def move_wrestler(self, wrestler, card):
         points = card.get_points(wrestler.tv_grade)
-        wrestler.score(points)
-        self.last_scorer = wrestler
-        other_wrestler = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
-        other_wrestler.last_card_scored = False
-        if isinstance(points, int):
-            return f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (+{points} points)"
+        if points == "d6":
+            return self.handle_d6_points(wrestler, card)
         else:
-            roll = random.randint(1, 6)
-            wrestler.score(roll)
-            return f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (d6 roll: {roll})"
+            wrestler.score(points)
+            self.last_scorer = wrestler
+            other_wrestler = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
+            other_wrestler.last_card_scored = False
+            return f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (+{points} points)"
 
     def play_turn(self):
         self.current_card = self.draw_card()
@@ -151,41 +154,35 @@ class Game:
         elif self.underdog_wrestler.grudge_grade > self.favored_wrestler.grudge_grade:
             return self.move_wrestler(self.underdog_wrestler, card)
         else:
-            return f"Grudge card tied. No points scored."
+            return self.resolve_tiebreaker(card)
 
     def resolve_in_control_card(self, card):
         print(f"Resolving In-Control card: {card.type}")
         print(f"Last scorer: {self.last_scorer.name if self.last_scorer else 'None'}")
-
+        
         if not self.last_scorer:
             return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card, is_from_in_control=True)
         
-        favored_has_skill = self.favored_wrestler.has_skill(card.type)
-        underdog_has_skill = self.underdog_wrestler.has_skill(card.type)
+        in_control_wrestler = self.last_scorer
+        other_wrestler = self.underdog_wrestler if in_control_wrestler == self.favored_wrestler else self.favored_wrestler
         
-        if self.last_scorer == self.favored_wrestler and favored_has_skill:
-            return self.move_wrestler(self.favored_wrestler, card)
-        elif self.last_scorer == self.underdog_wrestler and underdog_has_skill:
-            return self.move_wrestler(self.underdog_wrestler, card)
+        if in_control_wrestler.has_skill(card.type):
+            return self.move_wrestler(in_control_wrestler, card)
         
         new_card = self.draw_card()
         result = f"In-control wrestler doesn't have the skill. New card drawn: {new_card.type}\n"
 
-        opponent = self.underdog_wrestler if self.last_scorer == self.favored_wrestler else self.favored_wrestler
-        if opponent.has_skill(new_card.type):
-            result += self.move_wrestler(opponent, new_card)
+        if other_wrestler.has_skill(new_card.type):
+            result += self.move_wrestler(other_wrestler, new_card)
+            self.last_scorer = other_wrestler  # Set the other wrestler as the last scorer
         else:
             result += "Opponent doesn't have the skill either. No points scored."
         
-        # Reset in-control wrestler
-        self.last_scorer = None
         return result
 
     def resolve_signature_card(self, card):
         if self.last_scorer and self.last_scorer.last_card_scored:
-            points = random.randint(1, 6)
-            result = self.move_wrestler(self.last_scorer, card)
-            return f"{result} (Signature move: {points} points)"
+            return self.handle_d6_points(self.last_scorer, card)
         else:
             return "No wrestler eligible for Signature move. No points scored."
 
@@ -205,7 +202,7 @@ class Game:
         elif underdog_points > favored_points:
             return self.move_wrestler(self.underdog_wrestler, card)
         else:
-            return f"TV card tied. No points scored."
+            return self.resolve_tiebreaker(card)
 
     def resolve_wrestler_in_control(self, card, favored_has_skill, underdog_has_skill):
         result = "Resolving In-Control card:\n"
@@ -233,7 +230,10 @@ class Game:
             else:
                 result += "Neither wrestler has this skill. No movement."
         return result
-        
+
+    def roll_d6(self):
+        return random.randint(1, 6)
+
     def setup_game(self):
         if not self.favored_wrestler or not self.underdog_wrestler:
             print("Error: Wrestlers not selected")
