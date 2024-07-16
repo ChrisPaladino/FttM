@@ -88,12 +88,13 @@ class GameGUI:
             if i >= 12:  # PIN spaces
                 self.board_canvas.create_text(space_width/2, y+space_height/2, text="PIN")
 
+        piece_size = 15
         if self.game.favored_wrestler:
             favored_y = self.game.favored_wrestler.position * space_height + space_height/2
-            self.board_canvas.create_oval(5, favored_y-10, 25, favored_y+10, fill="blue")
+            self.board_canvas.create_oval(5, favored_y-piece_size/2, 5+piece_size, favored_y+piece_size/2, fill="blue")
         if self.game.underdog_wrestler:
             underdog_y = self.game.underdog_wrestler.position * space_height + space_height/2
-            self.board_canvas.create_oval(space_width-25, underdog_y-10, space_width-5, underdog_y+10, fill="red")
+            self.board_canvas.create_oval(space_width-5-piece_size, underdog_y-piece_size/2, space_width-5, underdog_y+piece_size/2, fill="red")
 
     def update_card_display(self):
         if self.game.current_card:

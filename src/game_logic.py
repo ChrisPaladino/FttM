@@ -24,6 +24,7 @@ class Card:
 
 class Game:
     def __init__(self):
+        self.in_control_counter = 0
         self.favored_wrestler = None
         self.underdog_wrestler = None
         self.wrestlers = self.load_wrestlers()
@@ -70,7 +71,7 @@ class Game:
         try:
             with open(file_path, 'r') as f:
                 data = json.load(f)
-            return [Wrestler(**w) for w in data['wrestlers']]
+            return [Wrestler(game=self, **w) for w in data['wrestlers']]
         except FileNotFoundError:
             print(f"Error: wrestlers.json not found at {file_path}")
             return []
@@ -82,12 +83,20 @@ class Game:
         points = card.get_points(wrestler.tv_grade)
         wrestler.score(points)
         self.last_scorer = wrestler
-        return f"{wrestler.name} used {card.type} and moved to postition {wrestler.position}"
+        other_wrestler = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
+        other_wrestler.last_card_scored = False
+        if isinstance(points, int):
+            return f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (+{points} points)"
+        else:
+            roll = random.randint(1, 6)
+            wrestler.score(roll)
+            return f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (d6 roll: {roll})"
 
     def play_turn(self):
         self.current_card = self.draw_card()
         if not self.current_card:
-            return "No cards available. Game cannot continue."    
+            return "No cards available. Game cannot continue."
+        print(f"Current card: {self.current_card.type}, Control: {self.current_card.control}")
         result = self.resolve_card(self.current_card)
         
         if self.check_win_condition():
@@ -96,12 +105,15 @@ class Game:
         
         return result
 
-    def resolve_card(self, card):
+    def resolve_card(self, card, is_from_in_control=False):
+        if card.control and not is_from_in_control:
+            self.in_control_counter += 1
+            print(f"In-Control card drawn. Total: {self.in_control_counter}")
         favored_has_skill = self.favored_wrestler.has_skill(card.type)
         underdog_has_skill = self.underdog_wrestler.has_skill(card.type)
-
-        if card.control:
-            return self.resolve_in_control_card(card, favored_has_skill, underdog_has_skill)
+        
+        if card.control and not is_from_in_control:
+            return self.resolve_in_control_card(card)
         
         if card.type == "Trailing":
             if self.favored_wrestler.is_trailing(self.underdog_wrestler):
@@ -110,7 +122,14 @@ class Game:
                 return self.move_wrestler(self.underdog_wrestler, card)
             else:
                 return "Neither wrester is trailing. No points scored."
-        
+
+        if card.type == "TV":
+            return self.resolve_tv_card(card)
+        elif card.type == "Grudge":
+            return self.resolve_grudge_card(card)
+        elif card.type == "Signature":
+            return self.resolve_signature_card(card)
+
         if favored_has_skill and underdog_has_skill:
             if self.favored_wrestler.is_trailing(self.underdog_wrestler):
                 return self.move_wrestler(self.favored_wrestler, card)
@@ -126,9 +145,23 @@ class Game:
         else:
             return f"Neither wrestler has the {card.type} skill. No points scored."
 
-    def resolve_in_control_card(self, card, favored_has_skill, underdog_has_skill):
+    def resolve_grudge_card(self, card):
+        if self.favored_wrestler.grudge_grade > self.underdog_wrestler.grudge_grade:
+            return self.move_wrestler(self.favored_wrestler, card)
+        elif self.underdog_wrestler.grudge_grade > self.favored_wrestler.grudge_grade:
+            return self.move_wrestler(self.underdog_wrestler, card)
+        else:
+            return f"Grudge card tied. No points scored."
+
+    def resolve_in_control_card(self, card):
+        print(f"Resolving In-Control card: {card.type}")
+        print(f"Last scorer: {self.last_scorer.name if self.last_scorer else 'None'}")
+
         if not self.last_scorer:
-            return "No wrestler in control. Treating as a normal card. \n" + self.resolve_card(card)
+            return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card, is_from_in_control=True)
+        
+        favored_has_skill = self.favored_wrestler.has_skill(card.type)
+        underdog_has_skill = self.underdog_wrestler.has_skill(card.type)
         
         if self.last_scorer == self.favored_wrestler and favored_has_skill:
             return self.move_wrestler(self.favored_wrestler, card)
@@ -148,6 +181,14 @@ class Game:
         self.last_scorer = None
         return result
 
+    def resolve_signature_card(self, card):
+        if self.last_scorer and self.last_scorer.last_card_scored:
+            points = random.randint(1, 6)
+            result = self.move_wrestler(self.last_scorer, card)
+            return f"{result} (Signature move: {points} points)"
+        else:
+            return "No wrestler eligible for Signature move. No points scored."
+
     def resolve_tiebreaker(self, card):
         if self.favored_wrestler.position < self.underdog_wrestler.position:
             return self.move_wrestler(self.favored_wrestler, card)
@@ -155,6 +196,16 @@ class Game:
             return self.move_wrestler(self.underdog_wrestler, card)
         else:
             return self.move_wrestler(self.underdog_wrestler, card)  # Underdog wins ties
+
+    def resolve_tv_card(self, card):
+        favored_points = card.get_points(self.favored_wrestler.tv_grade)
+        underdog_points = card.get_points(self.underdog_wrestler.tv_grade)
+        if favored_points > underdog_points:
+            return self.move_wrestler(self.favored_wrestler, card)
+        elif underdog_points > favored_points:
+            return self.move_wrestler(self.underdog_wrestler, card)
+        else:
+            return f"TV card tied. No points scored."
 
     def resolve_wrestler_in_control(self, card, favored_has_skill, underdog_has_skill):
         result = "Resolving In-Control card:\n"
@@ -190,14 +241,15 @@ class Game:
         self.load_and_shuffle_deck()
 
 class Wrestler:
-    def __init__(self, name, sex, height, weight, hometown, tv_grade, grudge_grade, skills, specialty, finisher, image="placeholder.png"):
+    def __init__(self, game, name, sex, height, weight, hometown, tv_grade, grudge_grade, skills, specialty, finisher, image="placeholder.png"):
+        self.game = game
         self.name = name
         self.sex = sex
         self.height = height
         self.weight = weight
         self.hometown = hometown
         self.tv_grade = tv_grade
-        self.grudge_grade = grudge_grade
+        self.grudge_grade = int(grudge_grade)
         self.skills = skills
         self.specialty = specialty
         self.finisher = finisher
@@ -210,11 +262,12 @@ class Wrestler:
         return skill.lower() in [s.lower() for s in self.skills]
 
     def is_trailing(self, opponent):
-        return self.position < opponent.position
-    
+        return self.position < opponent.position or (self.position == opponent.position and self == self.game.underdog_wrestler)    
+
     def score(self, points):
         self.position += points
-        self.position = min(self.position, 15)  # Ensure position doesn't exceed 15
+        self.position = min(self.position, 15)
+        self.last_card_scored = True
 
     @property
     def specialty_points(self):
