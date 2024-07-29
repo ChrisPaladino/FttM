@@ -226,7 +226,7 @@ class Game:
         elif self.underdog_wrestler.position < self.favored_wrestler.position:
             return self.move_wrestler(self.underdog_wrestler, card)
         else:
-            return self.move_wrestler(self.underdog_wrestler, card)  # Underdog wins ties
+            return self.move_wrestler(self.favored_wrestler, card)  # Favored wins ties
 
     def resolve_trailing_card(self, card):
         if self.favored_wrestler.is_trailing(self.underdog_wrestler):
