@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import scrolledtext
 
 class GameGUI:
     def __init__(self, master, game):
@@ -7,12 +8,23 @@ class GameGUI:
         self.game = game
         self.setup_gui()
 
+    def add_to_log(self, message):
+        self.log_text.config(state=tk.NORMAL)
+        self.log_text.insert(tk.END, message + "\n\n")
+        self.log_text.see(tk.END)  # Scroll to the bottom
+        self.log_text.config(state=tk.DISABLED)
+
+    def clear_log(self):
+        self.log_text.config(state=tk.NORMAL)
+        self.log_text.delete(1.0, tk.END)
+        self.log_text.config(state=tk.DISABLED)
+
     def play_turn(self):
         if not self.game.favored_wrestler or not self.game.underdog_wrestler:
-            self.result_label.config(text="Please select wrestlers to begin the game.")
+            self.add_to_log("Please select wrestlers to begin the game.")
             return
         result = self.game.play_turn()
-        self.result_label.config(text=result)
+        self.add_to_log(result)
         self.update_display()
         
         if self.game.check_win_condition():
@@ -61,8 +73,17 @@ class GameGUI:
         self.card_label = ttk.Label(self.card_frame, text="No card drawn yet")
         self.card_label.pack()
 
-        self.result_label = ttk.Label(middle_frame, text="", wraplength=200)
-        self.result_label.pack(pady=5)
+        # Log frame
+        self.log_frame = ttk.LabelFrame(middle_frame, text="Game Log", padding="5")
+        self.log_frame.pack(fill=tk.BOTH, expand=True, pady=(10, 0))
+
+        self.log_text = scrolledtext.ScrolledText(self.log_frame, wrap=tk.WORD, width=40, height=15)
+        self.log_text.pack(fill=tk.BOTH, expand=True)
+        self.log_text.config(state=tk.DISABLED)  # Make it read-only
+
+        # Clear log button
+        self.clear_log_button = ttk.Button(middle_frame, text="Clear Log", command=self.clear_log)
+        self.clear_log_button.pack(pady=(10, 0))
 
         # Right column: Game board
         right_frame = ttk.Frame(main_frame, padding="5")
@@ -100,7 +121,10 @@ class GameGUI:
         if self.game.current_card:
             card = self.game.current_card
             card_text = f"Move Type: {card.type}\n"
-            card_text += f"Points: {card.points}\n"
+            if isinstance(card.points, dict):
+                card_text += "Points: Varies by TV Grade\n"
+            else:
+                card_text += f"Points: {card.points}\n"
             card_text += f"In-Control: {'Yes' if card.control else 'No'}"
             self.card_label.config(text=card_text)
         else:
@@ -128,16 +152,16 @@ class GameGUI:
 
     def update_wrestler_info(self):
         info_text = ""
-        if self.game.favored_wrestler:
-            info_text += f"Favored: {self.game.favored_wrestler.name}\n"
-            info_text += f"  Position: {self.game.favored_wrestler.position}\n"
-            info_text += f"  TV Grade: {self.game.favored_wrestler.tv_grade}\n"
-            info_text += f"  Grudge Grade: {self.game.favored_wrestler.grudge_grade}\n"
-            info_text += f"  Skills: {', '.join(self.game.favored_wrestler.skills)}\n\n"
-        if self.game.underdog_wrestler:
-            info_text += f"Underdog: {self.game.underdog_wrestler.name}\n"
-            info_text += f"  Position: {self.game.underdog_wrestler.position}\n"
-            info_text += f"  TV Grade: {self.game.underdog_wrestler.tv_grade}\n"
-            info_text += f"  Grudge Grade: {self.game.underdog_wrestler.grudge_grade}\n"
-            info_text += f"  Skills: {', '.join(self.game.underdog_wrestler.skills)}\n"
+        for wrestler, role in [(self.game.favored_wrestler, "Favored"), (self.game.underdog_wrestler, "Underdog")]:
+            if wrestler:
+                info_text += f"{role}: {wrestler.name}\n"
+                info_text += f"  Position: {wrestler.position}\n"
+                info_text += f"  TV Grade: {wrestler.tv_grade}\n"
+                info_text += f"  Grudge Grade: {wrestler.grudge_grade}\n"
+                info_text += "  Skills:\n"
+                for skill, skill_type in wrestler.skills.items():
+                    info_text += f"    {skill.capitalize()}: {skill_type.capitalize()}\n"
+                if wrestler.has_specialty():
+                    info_text += f"  Specialty: {wrestler.specialty['name']} ({wrestler.specialty['points']} points)\n"
+                info_text += "\n"
         self.wrestler_info.config(text=info_text)
