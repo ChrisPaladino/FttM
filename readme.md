@@ -1,13 +1,15 @@
 #### Implement
 - Submission cards: moves break on 1-3 (1-4 if STRONG)
     - Confirm Submission works - why are we getting TV Grade?
+- Pin in spaces 12-15
+- Finisher in space 15, fail moves them back to space 9
+- Editor doesn't seem to save
+- Editor needs images
 - Highlight reel cards
 - Test of Strength cards: results (if both STRONG and/or POWERFUL)
      - 1-2: Face scores 1 point
      - 3-4: Ref breaks hold
      - 5-6: Heel scores 1 point
-- Pin in spaces 12-15
-- Finisher in space 15, fail moves them back to space 9
 - HELP that makes you roll on the TYPE chart
     - G = gang/group
     - M = manager
