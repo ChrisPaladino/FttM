@@ -1,11 +1,14 @@
 #### Implement
+- Make the whole system a bit more manual
+    - Allow moving of FAVORED / UNDERDOG pieces to specific places on the board
 - Submission cards: moves break on 1-3 (1-4 if STRONG)
     - Confirm Submission works - why are we getting TV Grade?
 - Pin in spaces 12-15
 - Finisher in space 15, fail moves them back to space 9
 - Editor doesn't seem to save
 - Editor needs images
-- Highlight reel cards
+- Wild Card / Highlight reel cards
+    - Need to distinguish which skills are mental vs. physical
 - Test of Strength cards: results (if both STRONG and/or POWERFUL)
      - 1-2: Face scores 1 point
      - 3-4: Ref breaks hold
