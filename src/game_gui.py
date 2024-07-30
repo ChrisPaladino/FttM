@@ -174,5 +174,7 @@ class GameGUI:
                     info_text += f"    {skill.capitalize()}: {skill_type.capitalize()}\n"
                 if wrestler.has_specialty():
                     info_text += f"  Specialty: {wrestler.specialty['name']} ({wrestler.specialty['points']} points)\n"
+                if wrestler.finisher:
+                    info_text += f"  Finisher: {wrestler.finisher['name']} (Range: {wrestler.finisher['range'][0]}-{wrestler.finisher['range'][1]})\n"
                 info_text += "\n"
         self.wrestler_info.config(text=info_text)

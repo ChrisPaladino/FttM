@@ -1,5 +1,7 @@
 #### Implement
-- Finisher in space 15, fail moves them back to space 9
+- Explain how Signature is resolved?
+    - We may need to have In-Control only for the 1 previous FAC, not a running total.
+    - An alternative is that the Signature gives more points to whoever was in control
 - Helped doesnt resolve properly if there's text and no points...
       {
         "id": 39,

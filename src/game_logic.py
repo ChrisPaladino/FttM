@@ -54,7 +54,7 @@ class Game:
         return result
 
     def attempt_pin(self):
-        pinner = self.favored_wrestler if self.favored_wrestler.position >= 12 else self.underdog_wrestler
+        pinner = max([self.favored_wrestler, self.underdog_wrestler], key=lambda w: w.position)
         defender = self.underdog_wrestler if pinner == self.favored_wrestler else self.favored_wrestler
         
         kick_out_range = self.get_pin_range(defender.tv_grade)
@@ -72,13 +72,6 @@ class Game:
         result += f"{defender.name} fails to kick out. {pinner.name} wins by pinfall!\n"
         self.game_over = True
         return result
-
-    def check_pin_or_finisher(self, wrestler):
-        if wrestler.position == 15:
-            return self.attempt_finisher(wrestler)
-        elif 12 <= wrestler.position <= 14:
-            return self.attempt_pin()
-        return None
 
     def draw_card(self):
         if not self.deck:
@@ -415,6 +408,8 @@ class Wrestler:
             except ValueError:
                 self.specialty['points'] = 0
         self.finisher = finisher
+        if self.finisher and 'range' in self.finisher:
+            self.finisher['range'] = tuple(map(int, self.finisher['range'].split('-')))
         self.image = image
         self.position = 0
         self.last_card_scored = False
@@ -449,7 +444,7 @@ class Wrestler:
         kickout_range = self.game.get_pin_range(self.tv_grade)
         result = ""
         for attempt in range(3):
-            roll = self.game.roll_two_dice()
+            roll = self.game.roll_d66()
             kickout_success = roll in kickout_range
             result += f"{self.name} kickout attempt {attempt + 1}: Rolled {roll} ({'Success' if kickout_success else 'Fail'})\n"
             if kickout_success:
