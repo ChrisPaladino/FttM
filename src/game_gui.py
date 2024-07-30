@@ -27,8 +27,9 @@ class GameGUI:
         self.add_to_log(result)
         self.update_display()
         
-        if self.game.check_win_condition():
+        if "successfully pins" in result or "wins the match" in result:
             self.action_button.config(state="disabled")
+            self.show_match_end_dialog(result)
 
     def setup_gui(self):
         self.master.title("Face to the Mat")
@@ -94,6 +95,16 @@ class GameGUI:
 
         self.update_wrestler_dropdowns()
         self.update_display()
+
+    def show_match_end_dialog(self, result):
+        end_dialog = tk.Toplevel(self.master)
+        end_dialog.title("Match Result")
+        
+        message = tk.Label(end_dialog, text=result, padx=20, pady=20)
+        message.pack()
+        
+        ok_button = ttk.Button(end_dialog, text="OK", command=end_dialog.destroy)
+        ok_button.pack(pady=10)
 
     def update_board(self):
         self.board_canvas.delete("all")

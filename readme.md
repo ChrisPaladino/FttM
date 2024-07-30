@@ -13,6 +13,16 @@
      - 1-2: Face scores 1 point
      - 3-4: Ref breaks hold
      - 5-6: Heel scores 1 point
+
+    - Verify this works, our underdog is STRONG: Star, so I suspect she CAN use the card
+Card drawn: Test of Strength (No Control)
+Card type: Test of Strength
+Favored can use: False
+Underdog can use: False
+Neither wrestler can use this skill. No points scored.
+
+
+
 - HELP that makes you roll on the TYPE chart
     - G = gang/group
     - M = manager
