@@ -34,6 +34,24 @@ class Game:
         self.current_card = None
         self.last_scorer = None
         self.load_and_shuffle_deck()
+        self.game_over = False
+
+    def attempt_finisher(self, wrestler):
+        if not wrestler.finisher:
+            return f"{wrestler.name} doesn't have a finisher move defined."
+        
+        result = f"{wrestler.name} attempts their finisher move: {wrestler.finisher['name']}!\n"
+        roll = self.roll_d66()
+        result += f"Dice roll: {roll}\n"
+        
+        if roll in range(wrestler.finisher['range'][0], wrestler.finisher['range'][1] + 1):
+            result += f"{wrestler.name}'s finisher is successful! They win the match!\n"
+            self.game_over = True
+        else:
+            result += f"{wrestler.name}'s finisher failed. They move back to position 9.\n"
+            wrestler.position = 9
+        
+        return result
 
     def attempt_pin(self):
         pinner = self.favored_wrestler if self.favored_wrestler.position >= 12 else self.underdog_wrestler
@@ -55,8 +73,12 @@ class Game:
         self.game_over = True
         return result
 
-    def check_win_condition(self):
-        return self.favored_wrestler.position >= 15 or self.underdog_wrestler.position >= 15
+    def check_pin_or_finisher(self, wrestler):
+        if wrestler.position == 15:
+            return self.attempt_finisher(wrestler)
+        elif 12 <= wrestler.position <= 14:
+            return self.attempt_pin()
+        return None
 
     def draw_card(self):
         if not self.deck:
@@ -157,14 +179,30 @@ class Game:
         
         turn_result = f"{card_info}\n{result}"
         
-        # Check for PIN opportunity
-        if 12 <= self.favored_wrestler.position <= 14 or 12 <= self.underdog_wrestler.position <= 15:
-            pin_result = self.attempt_pin()
-            turn_result += f"\n{pin_result}"
+        # Check for PIN or FINISHER opportunity only if a wrestler just moved
+        for wrestler in [self.favored_wrestler, self.underdog_wrestler]:
+            if wrestler.last_card_scored:
+                if wrestler.position in [12, 13, 14]:
+                    pin_result = self.attempt_pin()
+                    turn_result += f"\n{pin_result}"
+                    if "wins by pinfall" in pin_result:
+                        self.game_over = True
+                        return turn_result
+                elif wrestler.position == 15:
+                    finisher_result = self.attempt_finisher(wrestler)
+                    turn_result += f"\n{finisher_result}"
+                    if "They win the match" in finisher_result:
+                        self.game_over = True
+                        return turn_result
         
-        if self.check_win_condition():
-            winner = self.favored_wrestler if self.favored_wrestler.position >= 14 else self.underdog_wrestler
-            turn_result += f"\n{winner.name} wins the match!"
+        # Reset last_card_scored for both wrestlers
+        self.favored_wrestler.last_card_scored = False
+        self.underdog_wrestler.last_card_scored = False
+        
+        # Check if any wrestler has moved beyond position 15
+        for wrestler in [self.favored_wrestler, self.underdog_wrestler]:
+            if wrestler.position > 15:
+                wrestler.position = 15
         
         return turn_result
 

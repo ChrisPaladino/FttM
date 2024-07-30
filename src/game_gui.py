@@ -27,7 +27,7 @@ class GameGUI:
         self.add_to_log(result)
         self.update_display()
         
-        if "successfully pins" in result or "wins the match" in result:
+        if self.game.game_over:
             self.action_button.config(state="disabled")
             self.show_match_end_dialog(result)
 

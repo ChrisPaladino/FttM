@@ -1,10 +1,22 @@
 #### Implement
+- Finisher in space 15, fail moves them back to space 9
+- Helped doesnt resolve properly if there's text and no points...
+      {
+        "id": 39,
+        "control": false,
+        "type": "Helped",
+        "text": "Go to HIGHLIGHT REEL \"G\", \"M\" or \"V\" depending on the source of help."
+      },
+      {
+        "id": 40,
+        "control": false,
+        "type": "Helped",
+        "text": "Go to HIGHLIGHT REEL \"G\", \"M\" or \"V\" depending on the source of help."
+      },
 - Make the whole system a bit more manual
     - Allow moving of FAVORED / UNDERDOG pieces to specific places on the board
 - Submission cards: moves break on 1-3 (1-4 if STRONG)
     - Confirm Submission works - why are we getting TV Grade?
-- Pin in spaces 12-15
-- Finisher in space 15, fail moves them back to space 9
 - Editor doesn't seem to save
 - Editor needs images
 - Wild Card / Highlight reel cards
@@ -15,13 +27,11 @@
      - 5-6: Heel scores 1 point
 
     - Verify this works, our underdog is STRONG: Star, so I suspect she CAN use the card
-Card drawn: Test of Strength (No Control)
-Card type: Test of Strength
-Favored can use: False
-Underdog can use: False
-Neither wrestler can use this skill. No points scored.
-
-
+        Card drawn: Test of Strength (No Control)
+        Card type: Test of Strength
+        Favored can use: False
+        Underdog can use: False
+        Neither wrestler can use this skill. No points scored.
 
 - HELP that makes you roll on the TYPE chart
     - G = gang/group
