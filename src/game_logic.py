@@ -9,6 +9,7 @@ class Card:
         self.type = type
         self.points = points
         self.text = text
+        self.is_submission = "Submission!" in (text or "")
 
     def get_points(self, tv_grade=None):
         if isinstance(self.points, dict):  # TV card
@@ -86,19 +87,26 @@ class Game:
 
     def move_wrestler(self, wrestler, card):
         if card.type == "Specialty":
-            points = wrestler.specialty.get('points', 0)
+            points = int(wrestler.specialty.get('points', 0))
         elif card.type == "Signature":
             points = self.roll_d6()
         else:
             points = card.get_points(wrestler.tv_grade)
         
-        if points == "d6":
-            roll = self.roll_d6()
-            wrestler.score(roll)
-            result = f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (d6 roll: {roll})"
-        else:
-            wrestler.score(int(points))
-            result = f"{wrestler.name} used {card.type} and moved to position {wrestler.position} (+{points} points)"
+        if isinstance(points, str):
+            try:
+                points = int(points)
+            except ValueError:
+                if points == "d6":
+                    points = self.roll_d6()
+                else:
+                    points = 0  # Default to 0 if we can't convert to int
+        
+        wrestler.score(points)
+        result = f"{wrestler.name} used {card.type} "
+        if card.type == "Specialty":
+            result += f"({wrestler.specialty.get('name', 'Unnamed Specialty')}) "
+        result += f"and moved to position {wrestler.position} (+{points} points)"
 
         self.last_scorer = wrestler
         other_wrestler = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
@@ -124,15 +132,14 @@ class Game:
 
     def resolve_card(self, card, is_from_in_control=False):
         if card.control and not is_from_in_control:
-            self.in_control_counter += 1
             return self.resolve_in_control_card(card)
         
-        if card.type == "Signature":
-            return self.resolve_signature_card(card)
-        elif card.type == "Specialty":
+        if card.type == "Specialty":
             return self.resolve_specialty_card(card)
         elif card.type == "TV":
             return self.resolve_tv_card(card)
+        elif card.type == "Signature":
+            return self.resolve_signature_card(card)
         elif card.type == "Grudge":
             return self.resolve_grudge_card(card)
         elif card.type == "Trailing":
@@ -176,28 +183,38 @@ class Game:
         return result
 
     def resolve_in_control_card(self, card):
-        print(f"Resolving In-Control card: {card.type}")
-        print(f"Last scorer: {self.last_scorer.name if self.last_scorer else 'None'}")
-        
         if not self.last_scorer:
             return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card, is_from_in_control=True)
         
         in_control_wrestler = self.last_scorer
         other_wrestler = self.underdog_wrestler if in_control_wrestler == self.favored_wrestler else self.favored_wrestler
         
+        result = f"In-control card ({card.type}) for {in_control_wrestler.name}:\n"
+        
+        if card.type == "Specialty":
+            return result + self.resolve_specialty_card(card, in_control_wrestler)
+        elif card.type == "TV":
+            return result + self.resolve_tv_card(card)
+        elif card.type in ["Signature", "Grudge", "Trailing"]:
+            return result + self.resolve_card(card, is_from_in_control=True)
+        
         if in_control_wrestler.can_use_skill(card.type, in_control_wrestler.position):
-            return self.move_wrestler(in_control_wrestler, card)
+            return result + self.move_wrestler(in_control_wrestler, card)
         
         new_card = self.draw_card()
-        result = f"In-control wrestler doesn't have the skill. New card drawn: {new_card.type}\n"
-
-        if other_wrestler.can_use_skill(new_card.type, other_wrestler.position):
-            result += self.move_wrestler(other_wrestler, new_card)
-            self.last_scorer = other_wrestler  # Set the other wrestler as the last scorer
-        else:
-            result += "Opponent doesn't have the skill either. No points scored."
+        result += f"In-control wrestler can't use {card.type}. New card drawn: {new_card.type}\n"
         
-        return result
+        if new_card.type == "Specialty":
+            return result + self.resolve_specialty_card(new_card, other_wrestler)
+        elif new_card.type == "TV":
+            return result + self.resolve_tv_card(new_card)
+        elif new_card.type in ["Signature", "Grudge", "Trailing"]:
+            return result + self.resolve_card(new_card, is_from_in_control=True)
+        
+        if other_wrestler.can_use_skill(new_card.type, other_wrestler.position):
+            return result + self.move_wrestler(other_wrestler, new_card)
+        else:
+            return result + f"Opponent can't use {new_card.type} either. No points scored."
     
     def resolve_signature_card(self, card):
         if self.last_scorer and self.last_scorer.last_card_scored:
@@ -207,18 +224,49 @@ class Game:
         else:
             return "No wrestler eligible for Signature move. No points scored."
 
-    def resolve_specialty_card(self, card):
-        favored_has_specialty = self.favored_wrestler.has_specialty()
-        underdog_has_specialty = self.underdog_wrestler.has_specialty()
-
-        if favored_has_specialty and underdog_has_specialty:
-            return self.resolve_tiebreaker(card)
-        elif favored_has_specialty:
-            return self.move_wrestler(self.favored_wrestler, card)
-        elif underdog_has_specialty:
-            return self.move_wrestler(self.underdog_wrestler, card)
+    def resolve_specialty_card(self, card, in_control_wrestler=None):
+        result = "Specialty card drawn. "
+        
+        if in_control_wrestler:
+            if in_control_wrestler.has_specialty():
+                return result + self.move_wrestler(in_control_wrestler, card)
+            else:
+                other_wrestler = self.underdog_wrestler if in_control_wrestler == self.favored_wrestler else self.favored_wrestler
+                if other_wrestler.has_specialty():
+                    return result + self.move_wrestler(other_wrestler, card)
+                else:
+                    return result + "Neither wrestler has a Specialty defined. No points scored."
+        
+        if self.favored_wrestler.has_specialty() and self.underdog_wrestler.has_specialty():
+            result += "Both wrestlers have specialties. Using tiebreaker.\n"
+            return result + self.resolve_tiebreaker(card)
+        elif self.favored_wrestler.has_specialty():
+            return result + self.move_wrestler(self.favored_wrestler, card)
+        elif self.underdog_wrestler.has_specialty():
+            return result + self.move_wrestler(self.underdog_wrestler, card)
         else:
-            return "Neither wrestler has a Specialty. No points scored."
+            return result + "Neither wrestler has a Specialty defined. No points scored."
+
+    def resolve_submission_card(self, card, wrestler):
+        result = f"{wrestler.name} attempts a submission move!\n"
+        points_scored = card.get_points(wrestler.tv_grade)
+        wrestler.score(points_scored)
+        result += f"{wrestler.name} scores {points_scored} point(s). Position: {wrestler.position}\n"
+        
+        opponent = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
+        opponent_is_strong = opponent.has_skill('strong') or opponent.has_skill('powerful')
+        
+        while True:
+            roll = self.roll_d6()
+            break_hold = 3 if not opponent_is_strong else 4
+            if roll <= break_hold:
+                result += f"Opponent breaks the hold with a roll of {roll}.\n"
+                break
+            else:
+                wrestler.score(1)
+                result += f"{wrestler.name} scores an additional point. Position: {wrestler.position}\n"
+        
+        return result
 
     def resolve_tiebreaker(self, card):
         if self.favored_wrestler.position < self.underdog_wrestler.position:
@@ -237,11 +285,13 @@ class Game:
             return "Neither wrestler is trailing. No points scored."
 
     def resolve_tv_card(self, card):
-        favored_points = card.get_points(self.favored_wrestler.tv_grade)
-        underdog_points = card.get_points(self.underdog_wrestler.tv_grade)
-        if favored_points > underdog_points:
+        tv_grades = ['AAA', 'AA', 'A', 'B', 'C', 'D', 'E']
+        favored_grade = self.favored_wrestler.tv_grade
+        underdog_grade = self.underdog_wrestler.tv_grade
+        
+        if tv_grades.index(favored_grade) < tv_grades.index(underdog_grade):
             return self.move_wrestler(self.favored_wrestler, card)
-        elif underdog_points > favored_points:
+        elif tv_grades.index(underdog_grade) < tv_grades.index(favored_grade):
             return self.move_wrestler(self.underdog_wrestler, card)
         else:
             return self.resolve_tiebreaker(card)
@@ -282,7 +332,6 @@ class Game:
             return
         self.load_and_shuffle_deck()
 
-
 class Wrestler:
     def __init__(self, game, name, sex, height, weight, hometown, tv_grade, grudge_grade, skills, specialty, finisher, image="placeholder.png"):
         self.game = game
@@ -295,6 +344,11 @@ class Wrestler:
         self.grudge_grade = int(grudge_grade)
         self.skills = {k.lower(): v.lower() for k, v in skills.items()}  # Convert skills to lowercase
         self.specialty = specialty
+        if self.specialty and 'points' in self.specialty:
+            try:
+                self.specialty['points'] = int(self.specialty['points'])
+            except ValueError:
+                self.specialty['points'] = 0
         self.finisher = finisher
         self.image = image
         self.position = 0
@@ -318,8 +372,7 @@ class Wrestler:
         return False
 
     def has_skill(self, skill):
-        skill = skill.lower()
-        return skill in self.skills
+        return skill.lower() in self.skills
 
     def has_specialty(self):
         return bool(self.specialty and self.specialty.get('name') and self.specialty.get('points'))
