@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkinter import scrolledtext
 
 class GameGUI:
@@ -7,6 +7,7 @@ class GameGUI:
         self.master = master
         self.game = game
         self.setup_gui()
+        self.setup_match_controls()
 
     def add_to_log(self, message):
         self.log_text.config(state=tk.NORMAL)
@@ -30,6 +31,56 @@ class GameGUI:
         if self.game.game_over:
             self.action_button.config(state="disabled")
             self.show_match_end_dialog(result)
+
+    def post_match_roll(self):
+        winner = messagebox.askquestion("Winner", "Did the Face win?")
+        result = self.game.post_match_roll("Face" if winner == "yes" else "Heel")
+        self.add_to_log(result)
+
+    def pre_match_roll(self):
+        result = self.game.pre_match_roll()
+        self.add_to_log(result)
+
+    def set_in_control(self):
+        control = self.in_control_var.get()
+        if control == "Favored":
+            self.game.set_in_control(self.game.favored_wrestler)
+        elif control == "Underdog":
+            self.game.set_in_control(self.game.underdog_wrestler)
+        else:
+            self.game.set_in_control(None)
+        self.add_to_log(f"In Control set to: {control}")
+
+    def setup_match_controls(self):
+        control_frame = ttk.Frame(self.master, padding="10")
+        control_frame.grid(row=1, column=0, columnspan=3, sticky="ew")
+
+        ttk.Button(control_frame, text="Pre-Match Roll", command=self.pre_match_roll).pack(side="left", padx=5)
+        ttk.Button(control_frame, text="Post-Match Roll", command=self.post_match_roll).pack(side="left", padx=5)
+
+        ttk.Label(control_frame, text="Set Position:").pack(side="left", padx=5)
+        self.position_var = tk.StringVar()
+        ttk.Entry(control_frame, textvariable=self.position_var, width=5).pack(side="left")
+        ttk.Button(control_frame, text="Set Favored", command=lambda: self.set_position("Favored")).pack(side="left", padx=5)
+        ttk.Button(control_frame, text="Set Underdog", command=lambda: self.set_position("Underdog")).pack(side="left", padx=5)
+
+        ttk.Label(control_frame, text="In Control:").pack(side="left", padx=5)
+        self.in_control_var = tk.StringVar()
+        ttk.Combobox(control_frame, textvariable=self.in_control_var, values=["Favored", "Underdog", "Neither"]).pack(side="left")
+        ttk.Button(control_frame, text="Set Control", command=self.set_in_control).pack(side="left", padx=5)
+
+    def set_position(self, wrestler_type):
+        try:
+            position = int(self.position_var.get())
+            if 0 <= position <= 15:
+                wrestler = self.game.favored_wrestler if wrestler_type == "Favored" else self.game.underdog_wrestler
+                self.game.set_wrestler_position(wrestler, position)
+                self.update_display()
+                self.add_to_log(f"{wrestler_type} wrestler position set to {position}")
+            else:
+                messagebox.showerror("Error", "Position must be between 0 and 15")
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid number for the position")
 
     def setup_gui(self):
         self.master.title("Face to the Mat")
@@ -145,11 +196,17 @@ class GameGUI:
         self.update_wrestler_info()
         self.update_board()
         self.update_card_display()
+        self.update_in_control_display()
 
     def update_favored_wrestler(self, event):
         selected_name = self.favored_var.get()
         self.game.favored_wrestler = next(w for w in self.game.wrestlers if w.name == selected_name)
         self.update_display()
+
+    def update_in_control_display(self):
+        control_text = f"In Control: {self.game.in_control if self.game.in_control else 'Neither'}"
+        # Update this text on your GUI, e.g., by setting it to a Label
+        # self.control_label.config(text=control_text)
 
     def update_underdog_wrestler(self, event):
         selected_name = self.underdog_var.get()

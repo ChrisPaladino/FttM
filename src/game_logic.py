@@ -26,6 +26,7 @@ class Card:
 class Game:
     def __init__(self):
         self.in_control_counter = 0
+        self.in_control = None  # Can be "Favored", "Underdog", or None
         self.favored_wrestler = None
         self.underdog_wrestler = None
         self.wrestlers = self.load_wrestlers()
@@ -198,6 +199,23 @@ class Game:
                 wrestler.position = 15
         
         return turn_result
+
+    def post_match_roll(self, winner):
+        roll = self.roll_d6()
+        if 1 <= roll <= 4:
+            return f"Post-Match: Rolled {roll}. Use Highlight Reel 'X'"
+        else:
+            if winner == "Face":
+                return f"Post-Match: Rolled {roll}. Face won. Use Highlight Reel 'T'"
+            else:
+                return f"Post-Match: Rolled {roll}. Heel won. Use Highlight Reel 'U'"
+
+    def pre_match_roll(self):
+        roll = self.roll_d6()
+        if 1 <= roll <= 4:
+            return f"Pre-Match: Rolled {roll}. Use Highlight Reel 'O'"
+        else:
+            return f"Pre-Match: Rolled {roll}. Use Highlight Reel 'R'"
 
     def resolve_card(self, card, is_from_in_control=False):
         if card.control and not is_from_in_control:
@@ -383,6 +401,20 @@ class Game:
 
     def roll_d66(self):
         return random.randint(1, 6) * 10 + random.randint(1, 6)
+    
+    def set_in_control(self, wrestler):
+        if wrestler == self.favored_wrestler:
+            self.in_control = "Favored"
+        elif wrestler == self.underdog_wrestler:
+            self.in_control = "Underdog"
+        else:
+            self.in_control = None
+
+    def set_wrestler_position(self, wrestler, position):
+        if wrestler == self.favored_wrestler:
+            self.favored_wrestler.position = position
+        elif wrestler == self.underdog_wrestler:
+            self.underdog_wrestler.position = position
 
     def setup_game(self):
         if not self.favored_wrestler or not self.underdog_wrestler:
