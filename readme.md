@@ -1,4 +1,8 @@
 #### Implement
+- Hot Box:
+    - Grudge doesn't update if the wrestler is involved in the match
+    - Need to implement ALLY and FOE in the Wrestler JSON
+    - Need a way to do pre-match tweaks (TV Grade, Grudge Grade), and maybe Mid-Match as well?
 - Explain how Signature is resolved?
     - We may need to have In-Control only for the 1 previous FAC, not a running total.
     - An alternative is that the Signature gives more points to whoever was in control
@@ -15,9 +19,6 @@
         "type": "Helped",
         "text": "Go to HIGHLIGHT REEL \"G\", \"M\" or \"V\" depending on the source of help."
       },
-- Make the whole system a bit more manual
-    - Allow moving of FAVORED / UNDERDOG pieces to specific places on the board
-    - Let me confirm pin and finisher results
 - Submission cards: moves break on 1-3 (1-4 if STRONG)
     - Confirm Submission works - why are we getting TV Grade?
 - Editor needs images
@@ -34,13 +35,11 @@
         Favored can use: False
         Underdog can use: False
         Neither wrestler can use this skill. No points scored.
-
 - HELP that makes you roll on the TYPE chart
     - G = gang/group
     - M = manager
     - V = valet
 - Digitize the various charts
-- Implement the Hot Box (Favored, Ally, Foe, High Grudge; Underdog, Ally, Foe, High Grudge)
 - Implement the Pre and Post match charts
 - Ranking and pointing of wrestlers
      - https://www.reddit.com/r/FaceToTheMat/comments/noje6j/homebrew_fttm_overall_rating_based_on_attributes/

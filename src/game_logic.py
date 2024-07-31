@@ -33,7 +33,6 @@ class Game:
         self.deck = []
         self.discard_pile = []
         self.current_card = None
-        self.last_scorer = None
         self.load_and_shuffle_deck()
         self.game_over = False
 
@@ -157,13 +156,18 @@ class Game:
             result += f"({wrestler.specialty.get('name', 'Unnamed Specialty')}) "
         result += f"and moved to position {wrestler.position} (+{points} points)"
 
-        self.last_scorer = wrestler
+        if points > 0:
+            self.in_control = wrestler  # Set the in-control wrestler only if points were scored
+            result += f"\n{wrestler.name} is now in control."
+        
         other_wrestler = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
         other_wrestler.last_card_scored = False
         wrestler.last_card_scored = True
         return result
 
     def play_turn(self):
+        initial_control = f"Current in control: {self.in_control.name if self.in_control else 'Neither'}"
+        
         self.current_card = self.draw_card()
         if not self.current_card:
             return "No cards available. Game cannot continue."
@@ -171,7 +175,9 @@ class Game:
         card_info = f"Card drawn: {self.current_card.type} ({'Control' if self.current_card.control else 'No Control'})"
         result = self.resolve_card(self.current_card)
         
-        turn_result = f"{card_info}\n{result}"
+        new_control = f"New in control: {self.in_control.name if self.in_control else 'Neither'}"
+        
+        turn_result = f"{initial_control}\n{card_info}\n{result}\n{new_control}\n"
         
         # Check for PIN or FINISHER opportunity only if a wrestler just moved
         for wrestler in [self.favored_wrestler, self.underdog_wrestler]:
@@ -201,24 +207,26 @@ class Game:
         return turn_result
 
     def post_match_roll(self, winner):
-        roll = self.roll_d6()
-        if 1 <= roll <= 4:
-            return f"Post-Match: Rolled {roll}. Use Highlight Reel 'X'"
+        d6_roll = self.roll_d6()
+        d66_roll = self.roll_d66()
+        if 1 <= d6_roll <= 4:
+            return f"Post-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Use Highlight Reel 'X'"
         else:
             if winner == "Face":
-                return f"Post-Match: Rolled {roll}. Face won. Use Highlight Reel 'T'"
+                return f"Post-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Face won. Use Highlight Reel 'T'"
             else:
-                return f"Post-Match: Rolled {roll}. Heel won. Use Highlight Reel 'U'"
+                return f"Post-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Heel won. Use Highlight Reel 'U'"
 
     def pre_match_roll(self):
-        roll = self.roll_d6()
-        if 1 <= roll <= 4:
-            return f"Pre-Match: Rolled {roll}. Use Highlight Reel 'O'"
+        d6_roll = self.roll_d6()
+        d66_roll = self.roll_d66()
+        if 1 <= d6_roll <= 4:
+            return f"Pre-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Use Highlight Reel 'O'"
         else:
-            return f"Pre-Match: Rolled {roll}. Use Highlight Reel 'R'"
+            return f"Pre-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Use Highlight Reel 'R'"
 
     def resolve_card(self, card, is_from_in_control=False):
-        if card.control and not is_from_in_control:
+        if card.control and self.in_control:
             return self.resolve_in_control_card(card)
         
         if card.type == "Specialty":    
@@ -270,10 +278,10 @@ class Game:
         return result
 
     def resolve_in_control_card(self, card):
-        if not self.last_scorer:
+        if not self.in_control:
             return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card, is_from_in_control=True)
         
-        in_control_wrestler = self.last_scorer
+        in_control_wrestler = self.in_control
         other_wrestler = self.underdog_wrestler if in_control_wrestler == self.favored_wrestler else self.favored_wrestler
         
         result = f"In-control card ({card.type}) for {in_control_wrestler.name}:\n"
@@ -290,10 +298,10 @@ class Game:
             return result + f"{other_wrestler.name} can't use {new_card.type}. No points scored."
     
     def resolve_signature_card(self, card):
-        if self.last_scorer and self.last_scorer.last_card_scored:
+        if self.in_control and self.in_control.last_card_scored:
             roll = self.roll_d6()
-            self.last_scorer.score(roll)
-            return f"{self.last_scorer.name} used a Signature move and moved to position {self.last_scorer.position} (d6 roll: {roll})"
+            self.in_control.score(roll)
+            return f"{self.in_control.name} used a Signature move and moved to position {self.in_control.position} (d6 roll: {roll})"
         else:
             return "No wrestler eligible for Signature move. No points scored."
 
@@ -371,21 +379,21 @@ class Game:
 
     def resolve_wrestler_in_control(self, card, favored_has_skill, underdog_has_skill):
         result = "Resolving In-Control card:\n"
-        if self.last_scorer:
-            result += f"Last scorer was {self.last_scorer.name}\n"
-            if (self.last_scorer == self.favored_wrestler and favored_has_skill) or \
-               (self.last_scorer == self.underdog_wrestler and underdog_has_skill):
-                result += self.move_wrestler(self.last_scorer, card)
+        if self.in_control:
+            result += f"Wrestler in control is {self.in_control.name}\n"
+            if (self.in_control == self.favored_wrestler and favored_has_skill) or \
+            (self.in_control == self.underdog_wrestler and underdog_has_skill):
+                result += self.move_wrestler(self.in_control, card)
             else:
                 new_card = self.draw_card()
-                result += f"Last scorer doesn't have the skill. New card drawn: {new_card.move_type}\n"
-                opponent = self.underdog_wrestler if self.last_scorer == self.favored_wrestler else self.favored_wrestler
-                if new_card.move_type.lower() in [skill.lower() for skill in opponent.skills]:
+                result += f"{self.in_control.name} can't use {card.type}. New card drawn: {new_card.type}\n"
+                opponent = self.underdog_wrestler if self.in_control == self.favored_wrestler else self.favored_wrestler
+                if new_card.type.lower() in [skill.lower() for skill in opponent.skills]:
                     result += self.move_wrestler(opponent, new_card)
                 else:
                     result += "Neither wrestler could use the In-Control exchange. Play continues."
         else:
-            result += "No last scorer, resolving as a normal card.\n"
+            result += "No wrestler in control, resolving as a normal card.\n"
             if favored_has_skill and underdog_has_skill:
                 result += self.resolve_tiebreaker(card)
             elif favored_has_skill:

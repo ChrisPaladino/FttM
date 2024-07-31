@@ -114,7 +114,7 @@
       "weight": "170",
       "hometown": "Detroit, MI",
       "tv_grade": "C",
-      "grudge_grade": 0,
+      "grudge_grade": 1,
       "skills": {
         "Strong": "STAR",
         "Mean": "STAR",
@@ -191,8 +191,8 @@
       "height": "5'10\"",
       "weight": "175",
       "hometown": "Pittsburgh, PA",
-      "tv_grade": "C",
-      "grudge_grade": 0,
+      "tv_grade": "D",
+      "grudge_grade": -2,
       "skills": {
         "Strong": "STAR",
         "Powerful": "STAR",
@@ -219,7 +219,7 @@
       "weight": "140",
       "hometown": "San Quentin, CA",
       "tv_grade": "C",
-      "grudge_grade": 0,
+      "grudge_grade": -1,
       "skills": {
         "Helped": "SQUARE",
         "Mean": "STAR",
@@ -295,7 +295,7 @@
       "weight": "150",
       "hometown": "Vatican City",
       "tv_grade": "C",
-      "grudge_grade": 0,
+      "grudge_grade": -3,
       "skills": {
         "Agile": "STAR",
         "Helped": "STAR",
@@ -321,7 +321,7 @@
       "weight": "170",
       "hometown": "The Amazon Rainforest",
       "tv_grade": "C",
-      "grudge_grade": 0,
+      "grudge_grade": -2,
       "skills": {
         "Strong": "STAR",
         "Powerful": "STAR",
@@ -500,8 +500,8 @@
       "height": "5'7\"",
       "weight": "135",
       "hometown": "Phoenix, AZ",
-      "tv_grade": "C",
-      "grudge_grade": 2,
+      "tv_grade": "F",
+      "grudge_grade": 0,
       "skills": {
         "Helped": "CIRCLE",
         "Mean": "SQUARE",
@@ -629,7 +629,7 @@
       "weight": "140",
       "hometown": "Gotham City",
       "tv_grade": "D",
-      "grudge_grade": 3,
+      "grudge_grade": 1,
       "skills": {
         "Agile": "CIRCLE",
         "Cheat": "SQUARE",

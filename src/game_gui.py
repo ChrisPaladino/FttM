@@ -6,8 +6,34 @@ class GameGUI:
     def __init__(self, master, game):
         self.master = master
         self.game = game
+        
+        # Initialize all variables
+        self.favored_var = tk.StringVar()
+        self.underdog_var = tk.StringVar()
+        self.favored_ally_var = tk.StringVar()
+        self.favored_foe_var = tk.StringVar()
+        self.underdog_ally_var = tk.StringVar()
+        self.underdog_foe_var = tk.StringVar()
+        self.grudge1_var = tk.StringVar()
+        self.grudge2_var = tk.StringVar()
+        self.in_control_var = tk.StringVar(value="Neither")  # Add this line
+
+        # Initialize dropdown attributes
+        self.favored_dropdown = None
+        self.underdog_dropdown = None
+        self.favored_ally_dropdown = None
+        self.favored_foe_dropdown = None
+        self.underdog_ally_dropdown = None
+        self.underdog_foe_dropdown = None
+        self.grudge1_dropdown = None
+        self.grudge2_dropdown = None
+        
         self.setup_gui()
         self.setup_match_controls()
+        self.setup_hot_box()
+        
+        # Now that all UI elements are created, update the dropdowns
+        self.update_wrestler_dropdowns()
 
     def add_to_log(self, message):
         self.log_text.config(state=tk.NORMAL)
@@ -27,7 +53,8 @@ class GameGUI:
         result = self.game.play_turn()
         self.add_to_log(result)
         self.update_display()
-        
+        self.update_in_control_display()  # Update the display after each turn
+    
         if self.game.game_over:
             self.action_button.config(state="disabled")
             self.show_match_end_dialog(result)
@@ -44,12 +71,52 @@ class GameGUI:
     def set_in_control(self):
         control = self.in_control_var.get()
         if control == "Favored":
-            self.game.set_in_control(self.game.favored_wrestler)
+            self.game.in_control = self.game.favored_wrestler
         elif control == "Underdog":
-            self.game.set_in_control(self.game.underdog_wrestler)
+            self.game.in_control = self.game.underdog_wrestler
         else:
-            self.game.set_in_control(None)
-        self.add_to_log(f"In Control set to: {control}")
+            self.game.in_control = None
+        self.add_to_log(f"In Control manually set to: {control}")
+
+    def setup_hot_box(self):
+        hot_box_frame = ttk.LabelFrame(self.master, text="Hot Box", padding="10")
+        hot_box_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
+
+        # Initialize all dropdown variables
+        self.favored_ally_var = tk.StringVar()
+        self.favored_foe_var = tk.StringVar()
+        self.underdog_ally_var = tk.StringVar()
+        self.underdog_foe_var = tk.StringVar()
+        self.grudge1_var = tk.StringVar()
+        self.grudge2_var = tk.StringVar()
+
+        # Favored wrestler's ally and foe
+        ttk.Label(hot_box_frame, text="Favored Wrestler:").grid(row=0, column=0, sticky="e", padx=5, pady=2)
+        ttk.Label(hot_box_frame, text="Ally:").grid(row=0, column=1, sticky="e", padx=5, pady=2)
+        self.favored_ally_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.favored_ally_var)
+        self.favored_ally_dropdown.grid(row=0, column=2, sticky="ew", padx=5, pady=2)
+
+        ttk.Label(hot_box_frame, text="Foe:").grid(row=0, column=3, sticky="e", padx=5, pady=2)
+        self.favored_foe_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.favored_foe_var)
+        self.favored_foe_dropdown.grid(row=0, column=4, sticky="ew", padx=5, pady=2)
+
+        # Underdog wrestler's ally and foe
+        ttk.Label(hot_box_frame, text="Underdog Wrestler:").grid(row=1, column=0, sticky="e", padx=5, pady=2)
+        ttk.Label(hot_box_frame, text="Ally:").grid(row=1, column=1, sticky="e", padx=5, pady=2)
+        self.underdog_ally_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.underdog_ally_var)
+        self.underdog_ally_dropdown.grid(row=1, column=2, sticky="ew", padx=5, pady=2)
+
+        ttk.Label(hot_box_frame, text="Foe:").grid(row=1, column=3, sticky="e", padx=5, pady=2)
+        self.underdog_foe_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.underdog_foe_var)
+        self.underdog_foe_dropdown.grid(row=1, column=4, sticky="ew", padx=5, pady=2)
+
+        # Grudge wrestlers
+        ttk.Label(hot_box_frame, text="Grudge Wrestlers:").grid(row=2, column=0, sticky="e", padx=5, pady=2)
+        self.grudge1_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.grudge1_var)
+        self.grudge1_dropdown.grid(row=2, column=1, columnspan=2, sticky="ew", padx=5, pady=2)
+
+        self.grudge2_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.grudge2_var)
+        self.grudge2_dropdown.grid(row=2, column=3, columnspan=2, sticky="ew", padx=5, pady=2)
 
     def setup_match_controls(self):
         control_frame = ttk.Frame(self.master, padding="10")
@@ -65,9 +132,9 @@ class GameGUI:
         ttk.Button(control_frame, text="Set Underdog", command=lambda: self.set_position("Underdog")).pack(side="left", padx=5)
 
         ttk.Label(control_frame, text="In Control:").pack(side="left", padx=5)
-        self.in_control_var = tk.StringVar()
         ttk.Combobox(control_frame, textvariable=self.in_control_var, values=["Favored", "Underdog", "Neither"]).pack(side="left")
         ttk.Button(control_frame, text="Set Control", command=self.set_in_control).pack(side="left", padx=5)
+
 
     def set_position(self, wrestler_type):
         try:
@@ -84,7 +151,7 @@ class GameGUI:
 
     def setup_gui(self):
         self.master.title("Face to the Mat")
-        self.master.geometry("1000x600")
+        self.master.geometry("825x650")
 
         # Main frame
         main_frame = ttk.Frame(self.master, padding="10")
@@ -144,7 +211,6 @@ class GameGUI:
         self.board_canvas = tk.Canvas(right_frame, width=100, height=400)
         self.board_canvas.pack(fill=tk.BOTH, expand=True)
 
-        self.update_wrestler_dropdowns()
         self.update_display()
 
     def show_match_end_dialog(self, result):
@@ -197,26 +263,64 @@ class GameGUI:
         self.update_board()
         self.update_card_display()
         self.update_in_control_display()
+        self.update_hot_box_display()
 
     def update_favored_wrestler(self, event):
         selected_name = self.favored_var.get()
         self.game.favored_wrestler = next(w for w in self.game.wrestlers if w.name == selected_name)
         self.update_display()
+        self.update_hot_box_dropdowns()
+
+    def update_hot_box_display(self):
+        # Update the Hot Box information in your display
+        hot_box_info = f"Hot Box:\n"
+        hot_box_info += f"Favored Ally: {self.favored_ally_var.get()}\n"
+        hot_box_info += f"Favored Foe: {self.favored_foe_var.get()}\n"
+        hot_box_info += f"Underdog Ally: {self.underdog_ally_var.get()}\n"
+        hot_box_info += f"Underdog Foe: {self.underdog_foe_var.get()}\n"
+        hot_box_info += f"Grudge Wrestlers: {self.grudge1_var.get()}, {self.grudge2_var.get()}"
+
+        # Update this text on your GUI, e.g., by setting it to a Label
+        # self.hot_box_label.config(text=hot_box_info)
+
+    def update_hot_box_dropdowns(self):
+        wrestler_names = sorted([w.name for w in self.game.wrestlers])
+        
+        for dropdown in [self.favored_ally_dropdown, self.favored_foe_dropdown,
+                         self.underdog_ally_dropdown, self.underdog_foe_dropdown,
+                         self.grudge1_dropdown, self.grudge2_dropdown]:
+            if dropdown:  # Check if dropdown exists before updating
+                dropdown['values'] = wrestler_names
+
+        # Set default values for grudge wrestlers
+        grudge_wrestlers = sorted(self.game.wrestlers, key=lambda w: w.grudge_grade, reverse=True)[:2]
+        if self.grudge1_dropdown and grudge_wrestlers:
+            self.grudge1_var.set(grudge_wrestlers[0].name)
+        if self.grudge2_dropdown and len(grudge_wrestlers) > 1:
+            self.grudge2_var.set(grudge_wrestlers[1].name)
 
     def update_in_control_display(self):
-        control_text = f"In Control: {self.game.in_control if self.game.in_control else 'Neither'}"
-        # Update this text on your GUI, e.g., by setting it to a Label
-        # self.control_label.config(text=control_text)
+        if self.game.in_control == self.game.favored_wrestler:
+            control_text = "Favored"
+        elif self.game.in_control == self.game.underdog_wrestler:
+            control_text = "Underdog"
+        else:
+            control_text = "Neither"
+        self.in_control_var.set(control_text)
 
     def update_underdog_wrestler(self, event):
         selected_name = self.underdog_var.get()
         self.game.underdog_wrestler = next(w for w in self.game.wrestlers if w.name == selected_name)
         self.update_display()
+        self.update_hot_box_dropdowns()
 
     def update_wrestler_dropdowns(self):
-        wrestler_names = [w.name for w in self.game.wrestlers]
-        self.favored_dropdown['values'] = wrestler_names
-        self.underdog_dropdown['values'] = wrestler_names
+        wrestler_names = sorted([w.name for w in self.game.wrestlers])
+        if self.favored_dropdown:
+            self.favored_dropdown['values'] = wrestler_names
+        if self.underdog_dropdown:
+            self.underdog_dropdown['values'] = wrestler_names
+        self.update_hot_box_dropdowns()
 
     def update_wrestler_info(self):
         info_text = ""

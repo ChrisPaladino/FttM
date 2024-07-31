@@ -51,7 +51,8 @@ class WrestlerEditor:
         selection = self.wrestler_listbox.curselection()
         if selection:
             index = selection[0]
-            del self.wrestlers[index]
+            wrestler_to_delete = self.sorted_wrestlers[index]
+            self.wrestlers.remove(wrestler_to_delete)
             self.update_wrestler_list()
             self.current_wrestler = None
             self.load_wrestler_details()
@@ -86,15 +87,15 @@ class WrestlerEditor:
     def new_wrestler(self):
         self.current_wrestler = Wrestler()
         self.wrestlers.append(self.current_wrestler)
-        self.update_wrestler_list()
         self.clear_form()
         self.load_wrestler_details()
+        self.update_wrestler_list()  # This will now sort the list
 
     def on_select(self, event):
         selection = self.wrestler_listbox.curselection()
         if selection:
             index = selection[0]
-            self.current_wrestler = self.wrestlers[index]
+            self.current_wrestler = self.sorted_wrestlers[index]
             self.load_wrestler_details()
 
     def remove_skill(self):
@@ -107,6 +108,7 @@ class WrestlerEditor:
 
     def save_current_wrestler(self):
         if self.current_wrestler:
+            # Update the current wrestler's attributes
             self.current_wrestler.name = self.name_var.get()
             self.current_wrestler.sex = self.sex_var.get()
             self.current_wrestler.height = self.height_var.get()
@@ -119,10 +121,15 @@ class WrestlerEditor:
             self.current_wrestler.specialty["type"] = "STAR"
             self.current_wrestler.finisher["name"] = self.finisher_name_var.get()
             self.current_wrestler.finisher["range"] = self.finisher_range_var.get()
+            
+            # If the wrestler is new, add it to the list
+            if self.current_wrestler not in self.wrestlers:
+                self.wrestlers.append(self.current_wrestler)
+            
             self.update_wrestler_list()
-            messagebox.showinfo("Success", "Wrestler saved successfully!")
+            print ("Success", "Wrestler saved successfully!")
         else:
-            messagebox.showwarning("Warning", "No wrestler selected to save.")
+            print ("Warning", "No wrestler selected to save.")
 
     def save_wrestlers(self):
         file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
@@ -245,7 +252,8 @@ class WrestlerEditor:
 
     def update_wrestler_list(self):
         self.wrestler_listbox.delete(0, tk.END)
-        for wrestler in self.wrestlers:
+        self.sorted_wrestlers = sorted(self.wrestlers, key=lambda w: w.name.lower())
+        for wrestler in self.sorted_wrestlers:
             self.wrestler_listbox.insert(tk.END, wrestler.name)
 
 def main():
