@@ -20,7 +20,6 @@
     - Let me confirm pin and finisher results
 - Submission cards: moves break on 1-3 (1-4 if STRONG)
     - Confirm Submission works - why are we getting TV Grade?
-- Editor doesn't seem to save
 - Editor needs images
 - Wild Card / Highlight reel cards
     - Need to distinguish which skills are mental vs. physical
