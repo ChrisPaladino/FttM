@@ -23,9 +23,56 @@ class WrestlerEditor:
         self.master.title("Wrestler Editor")
         self.master.geometry("1200x600")
         self.wrestlers = self.load_wrestlers()
-        self.current_wrestler = None
-        
+        self.current_wrestler = None        
         self.setup_ui()
+
+    def add_skill(self):
+        skill = self.skill_var.get()
+        skill_type = self.skill_type_var.get()
+        if skill and skill_type:
+            self.current_wrestler.skills[skill] = skill_type.lower()
+            self.skills_listbox.insert(tk.END, f"{skill}: {skill_type.capitalize()}")
+
+    def clear_form(self):
+        self.name_var.set("")
+        self.sex_var.set("Male")
+        self.height_var.set("")
+        self.weight_var.set("")
+        self.hometown_var.set("")
+        self.tv_grade_var.set("C")
+        self.grudge_grade_var.set("0")
+        self.specialty_name_var.set("")
+        self.specialty_points_var.set("")
+        self.finisher_name_var.set("")
+        self.finisher_range_var.set("")
+        self.skills_listbox.delete(0, tk.END)
+
+    def delete_wrestler(self):
+        selection = self.wrestler_listbox.curselection()
+        if selection:
+            index = selection[0]
+            del self.wrestlers[index]
+            self.update_wrestler_list()
+            self.current_wrestler = None
+            self.load_wrestler_details()
+
+    def load_wrestler_details(self):
+        if self.current_wrestler:
+            self.name_var.set(self.current_wrestler.name)
+            self.sex_var.set(self.current_wrestler.sex)
+            self.height_var.set(self.current_wrestler.height)
+            self.weight_var.set(self.current_wrestler.weight)
+            self.hometown_var.set(self.current_wrestler.hometown)
+            self.tv_grade_var.set(self.current_wrestler.tv_grade)
+            self.grudge_grade_var.set(str(self.current_wrestler.grudge_grade))
+            self.specialty_name_var.set(self.current_wrestler.specialty["name"])
+            self.specialty_points_var.set(self.current_wrestler.specialty["points"])
+            self.finisher_name_var.set(self.current_wrestler.finisher["name"])
+            self.finisher_range_var.set(self.current_wrestler.finisher["range"])
+            
+            self.skills_listbox.delete(0, tk.END)
+            for skill, skill_type in self.current_wrestler.skills.items():
+                self.skills_listbox.insert(tk.END, f"{skill}: {skill_type.capitalize()}")
 
     def load_wrestlers(self):
         file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
@@ -36,13 +83,54 @@ class WrestlerEditor:
         except FileNotFoundError:
             return []
 
+    def new_wrestler(self):
+        self.current_wrestler = Wrestler()
+        self.wrestlers.append(self.current_wrestler)
+        self.update_wrestler_list()
+        self.clear_form()
+        self.load_wrestler_details()
+
+    def on_select(self, event):
+        selection = self.wrestler_listbox.curselection()
+        if selection:
+            index = selection[0]
+            self.current_wrestler = self.wrestlers[index]
+            self.load_wrestler_details()
+
+    def remove_skill(self):
+        selection = self.skills_listbox.curselection()
+        if selection:
+            index = selection[0]
+            skill = self.skills_listbox.get(index).split(":")[0].strip()
+            del self.current_wrestler.skills[skill]
+            self.skills_listbox.delete(index)
+
+    def save_current_wrestler(self):
+        if self.current_wrestler:
+            self.current_wrestler.name = self.name_var.get()
+            self.current_wrestler.sex = self.sex_var.get()
+            self.current_wrestler.height = self.height_var.get()
+            self.current_wrestler.weight = self.weight_var.get()
+            self.current_wrestler.hometown = self.hometown_var.get()
+            self.current_wrestler.tv_grade = self.tv_grade_var.get()
+            self.current_wrestler.grudge_grade = int(self.grudge_grade_var.get())
+            self.current_wrestler.specialty["name"] = self.specialty_name_var.get()
+            self.current_wrestler.specialty["points"] = self.specialty_points_var.get()
+            self.current_wrestler.specialty["type"] = "STAR"
+            self.current_wrestler.finisher["name"] = self.finisher_name_var.get()
+            self.current_wrestler.finisher["range"] = self.finisher_range_var.get()
+            self.update_wrestler_list()
+            messagebox.showinfo("Success", "Wrestler saved successfully!")
+        else:
+            messagebox.showwarning("Warning", "No wrestler selected to save.")
+
     def save_wrestlers(self):
         file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         data = {'wrestlers': [vars(w) for w in self.wrestlers]}
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=2)
-        messagebox.showinfo("Success", "Wrestlers saved successfully!")
+        messagebox.showinfo("Success", "All wrestlers saved successfully!")
 
     def setup_ui(self):
         self.master.columnconfigure(0, weight=1)
@@ -61,7 +149,7 @@ class WrestlerEditor:
 
         ttk.Button(left_frame, text="New Wrestler", command=self.new_wrestler).pack(pady=5)
         ttk.Button(left_frame, text="Delete Wrestler", command=self.delete_wrestler).pack(pady=5)
-        ttk.Button(left_frame, text="Save All", command=self.save_wrestlers).pack(pady=5)
+        ttk.Button(left_frame, text="Save All Wrestlers", command=self.save_wrestlers).pack(pady=5)
 
         # Middle frame for personal details and wrestling stats
         middle_frame = ttk.Frame(self.master, padding="10")
@@ -153,84 +241,12 @@ class WrestlerEditor:
         ttk.Label(right_frame, text="Range:").grid(row=11, column=0, sticky="e", pady=2)
         ttk.Entry(right_frame, textvariable=self.finisher_range_var).grid(row=11, column=1, sticky="ew", pady=2)
 
-        ttk.Button(right_frame, text="Save Wrestler", command=self.save_current_wrestler).grid(row=12, column=0, columnspan=2, pady=10)
+        ttk.Button(right_frame, text="Save Current Wrestler", command=self.save_current_wrestler).grid(row=12, column=0, columnspan=2, pady=10)
 
     def update_wrestler_list(self):
         self.wrestler_listbox.delete(0, tk.END)
         for wrestler in self.wrestlers:
             self.wrestler_listbox.insert(tk.END, wrestler.name)
-
-    def on_select(self, event):
-        selection = self.wrestler_listbox.curselection()
-        if selection:
-            index = selection[0]
-            self.current_wrestler = self.wrestlers[index]
-            self.load_wrestler_details()
-
-    def load_wrestler_details(self):
-        if self.current_wrestler:
-            self.name_var.set(self.current_wrestler.name)
-            self.sex_var.set(self.current_wrestler.sex)
-            self.height_var.set(self.current_wrestler.height)
-            self.weight_var.set(self.current_wrestler.weight)
-            self.hometown_var.set(self.current_wrestler.hometown)
-            self.tv_grade_var.set(self.current_wrestler.tv_grade)
-            self.grudge_grade_var.set(str(self.current_wrestler.grudge_grade))
-            self.specialty_name_var.set(self.current_wrestler.specialty["name"])
-            self.specialty_points_var.set(self.current_wrestler.specialty["points"])
-            self.finisher_name_var.set(self.current_wrestler.finisher["name"])
-            self.finisher_range_var.set(self.current_wrestler.finisher["range"])
-            
-            self.skills_listbox.delete(0, tk.END)
-            for skill, skill_type in self.current_wrestler.skills.items():
-                self.skills_listbox.insert(tk.END, f"{skill}: {skill_type.capitalize()}")
-
-    def new_wrestler(self):
-        self.current_wrestler = Wrestler()
-        self.wrestlers.append(self.current_wrestler)
-        self.update_wrestler_list()
-        self.load_wrestler_details()
-
-    def delete_wrestler(self):
-        selection = self.wrestler_listbox.curselection()
-        if selection:
-            index = selection[0]
-            del self.wrestlers[index]
-            self.update_wrestler_list()
-            self.current_wrestler = None
-            self.load_wrestler_details()
-
-    def add_skill(self):
-        skill = self.skill_var.get()
-        skill_type = self.skill_type_var.get()
-        if skill and skill_type:
-            self.current_wrestler.skills[skill] = skill_type.lower()
-            self.skills_listbox.insert(tk.END, f"{skill}: {skill_type.capitalize()}")
-
-    def remove_skill(self):
-        selection = self.skills_listbox.curselection()
-        if selection:
-            index = selection[0]
-            skill = self.skills_listbox.get(index).split(":")[0].strip()
-            del self.current_wrestler.skills[skill]
-            self.skills_listbox.delete(index)
-
-    def save_current_wrestler(self):
-        if self.current_wrestler:
-            self.current_wrestler.name = self.name_var.get()
-            self.current_wrestler.sex = self.sex_var.get()
-            self.current_wrestler.height = self.height_var.get()
-            self.current_wrestler.weight = self.weight_var.get()
-            self.current_wrestler.hometown = self.hometown_var.get()
-            self.current_wrestler.tv_grade = self.tv_grade_var.get()
-            self.current_wrestler.grudge_grade = int(self.grudge_grade_var.get())
-            self.current_wrestler.specialty["name"] = self.specialty_name_var.get()
-            self.current_wrestler.specialty["points"] = self.specialty_points_var.get()
-            self.current_wrestler.specialty["type"] = "star"
-            self.current_wrestler.finisher["name"] = self.finisher_name_var.get()
-            self.current_wrestler.finisher["range"] = self.finisher_range_var.get()
-            self.update_wrestler_list()
-            messagebox.showinfo("Success", "Wrestler saved successfully!")
 
 def main():
     root = tk.Tk()

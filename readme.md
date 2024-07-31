@@ -17,6 +17,7 @@
       },
 - Make the whole system a bit more manual
     - Allow moving of FAVORED / UNDERDOG pieces to specific places on the board
+    - Let me confirm pin and finisher results
 - Submission cards: moves break on 1-3 (1-4 if STRONG)
     - Confirm Submission works - why are we getting TV Grade?
 - Editor doesn't seem to save
@@ -41,6 +42,7 @@
     - V = valet
 - Digitize the various charts
 - Implement the Hot Box (Favored, Ally, Foe, High Grudge; Underdog, Ally, Foe, High Grudge)
+- Implement the Pre and Post match charts
 - Ranking and pointing of wrestlers
      - https://www.reddit.com/r/FaceToTheMat/comments/noje6j/homebrew_fttm_overall_rating_based_on_attributes/
 - Contracts

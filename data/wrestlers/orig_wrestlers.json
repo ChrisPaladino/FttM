@@ -1,0 +1,676 @@
+{
+    "wrestlers": [
+      {
+        "name": "Liberty Belle",
+        "sex": "Female",
+        "height": "5'7\"",
+        "weight": "145",
+        "hometown": "Philadelphia, PA",
+        "tv_grade": "A",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Favorite": "STAR",
+          "Powerful": "STAR",
+          "Quick": "STAR",
+          "Smart": "SQUARE",
+          "Strong": "STAR"
+        },
+        "specialty": {
+          "name": "Patriot Punch (overhand right)",
+          "points": "4",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Stars and Stripes Slam",
+          "range": "11-45"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Gwendolyn Graves",
+        "sex": "Female",
+        "height": "5'8\"",
+        "weight": "135",
+        "hometown": "Salem, MA",
+        "tv_grade": "B",
+        "grudge_grade": 2,
+        "skills": {
+          "Helped": "SQUARE",
+          "Mean": "STAR",
+          "Cheat": "STAR",
+          "Smart": "STAR",
+          "Agile": "STAR",
+          "Powerful": "STAR"
+        },
+        "specialty": {
+          "name": "Coffin Drop (top rope senton)",
+          "points": "4",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Grave's End Submission",
+          "range": "11-44"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Sammy Sparks",
+        "sex": "Female",
+        "height": "5'5\"",
+        "weight": "125",
+        "hometown": "Las Vegas, NV",
+        "tv_grade": "B",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Smart": "STAR",
+          "Quick": "STAR",
+          "Favorite": "STAR",
+          "Powerful": "STAR",
+          "Cheat": "SQUARE"
+        },
+        "specialty": {
+          "name": "Electric Slide (running dropkick)",
+          "points": "4",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Spark Plug Corkscrew Shooting Star Press",
+          "range": "11-43"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Brook Buchanan",
+        "sex": "Female",
+        "height": "5'9\"",
+        "weight": "185",
+        "hometown": "Austin, TX",
+        "tv_grade": "B",
+        "grudge_grade": 0,
+        "skills": {
+          "Strong": "STAR",
+          "Helped": "SQUARE",
+          "Powerful": "STAR",
+          "Mean": "SQUARE",
+          "Quick": "STAR"
+        },
+        "specialty": {
+          "name": "Lonestar Lariat (clothesline)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Brooke Breaker Spear",
+          "range": "11-43"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Rogue Titan",
+        "sex": "Female",
+        "height": "5'10\"",
+        "weight": "170",
+        "hometown": "Detroit, MI",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Strong": "STAR",
+          "Mean": "STAR",
+          "Cheat": "STAR",
+          "Powerful": "STAR",
+          "Object": "STAR"
+        },
+        "specialty": {
+          "name": "Motor City Mayhem (running knee)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Blue Spike Piledriver",
+          "range": "11-43"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Candy Crush",
+        "sex": "Female",
+        "height": "5'9\"",
+        "weight": "155",
+        "hometown": "New Orleans, LA",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Helped": "STAR",
+          "Powerful": "STAR",
+          "Strong": "STAR",
+          "Smart": "CIRCLE",
+          "Favorite": "STAR"
+        },
+        "specialty": {
+          "name": "Sweet Chin Music (superkick)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Sugar Rush Spinning Backfist",
+          "range": "11-42"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Cassie Crush",
+        "sex": "Female",
+        "height": "5'8\"",
+        "weight": "150",
+        "hometown": "New Orleans, LA",
+        "tv_grade": "C",
+        "grudge_grade": 6,
+        "skills": {
+          "Helped": "STAR",
+          "Powerful": "STAR",
+          "Strong": "CIRCLE",
+          "Smart": "STAR",
+          "Favorite": "STAR"
+        },
+        "specialty": {
+          "name": "Jawbreaker (stunner)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Crusher Elbow Drop from Top Rope",
+          "range": "11-41"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Priscilla Steele",
+        "sex": "Female",
+        "height": "5'10\"",
+        "weight": "175",
+        "hometown": "Pittsburgh, PA",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Strong": "STAR",
+          "Powerful": "STAR",
+          "Heavy": "SQUARE",
+          "Mean": "SQUARE",
+          "Smart": "STAR",
+          "Favorite": "SQUARE"
+        },
+        "specialty": {
+          "name": "Iron Maiden (Boston crab)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Steele Curtain Razor's Edge",
+          "range": "11-36"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Alyssa Warden",
+        "sex": "Female",
+        "height": "5'8\"",
+        "weight": "140",
+        "hometown": "San Quentin, CA",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Helped": "SQUARE",
+          "Mean": "STAR",
+          "Cheat": "SQUARE",
+          "Smart": "STAR",
+          "Agile": "STAR"
+        },
+        "specialty": {
+          "name": "Solitary Lock (armbar)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Warden's Wrap Submission",
+          "range": "11-35"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Mika Munson",
+        "sex": "Female",
+        "height": "5'9\"",
+        "weight": "145",
+        "hometown": "Chernobyl, Ukraine",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Mean": "STAR",
+          "Favorite": "STAR",
+          "Powerful": "STAR"
+        },
+        "specialty": {
+          "name": "Radiation Lock (abdominal stretch)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Toxic Shock Side Slam",
+          "range": "11-35"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Neon",
+        "sex": "Female",
+        "height": "5'7\"",
+        "weight": "150",
+        "hometown": "Tokyo, Japan",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Quick": "STAR",
+          "Smart": "STAR",
+          "Helped": "STAR"
+        },
+        "specialty": {
+          "name": "Fluorescent Flash (handspring elbow)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Neon Nova Jumping Knee",
+          "range": "11-34"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Sister Sinister",
+        "sex": "Female",
+        "height": "5'8\"",
+        "weight": "150",
+        "hometown": "Vatican City",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Helped": "STAR",
+          "Mean": "STAR",
+          "Cheat": "CIRCLE",
+          "Object": "SQUARE"
+        },
+        "specialty": {
+          "name": "Holy Roller (rolling cutter)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Stigmata Jumping Slam",
+          "range": "11-34"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Jungle Queen",
+        "sex": "Female",
+        "height": "5'10\"",
+        "weight": "170",
+        "hometown": "The Amazon Rainforest",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Strong": "STAR",
+          "Powerful": "STAR",
+          "Mean": "SQUARE",
+          "Smart": "STAR",
+          "Quick": "CIRCLE"
+        },
+        "specialty": {
+          "name": "Vine Swing (swinging neckbreaker)",
+          "points": "3",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Savage Slam",
+          "range": "11-33"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Valkyrie",
+        "sex": "Female",
+        "height": "5'11\"",
+        "weight": "185",
+        "hometown": "Oslo, Norway",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Heavy": "CIRCLE",
+          "Strong": "STAR",
+          "Helped": "SQUARE",
+          "Powerful": "STAR",
+          "Favorite": "STAR"
+        },
+        "specialty": {
+          "name": "Shield Maiden (running crossbody)",
+          "points": "2",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Angel's Kiss DDT",
+          "range": "11-33"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Onyx",
+        "sex": "Female",
+        "height": "6'0\"",
+        "weight": "200",
+        "hometown": "Johannesburg, South Africa",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Heavy": "STAR",
+          "Strong": "CIRCLE",
+          "Powerful": "CIRCLE",
+          "Mean": "STAR",
+          "Helped": "STAR"
+        },
+        "specialty": {
+          "name": "Diamond Cutter (jumping cutter)",
+          "points": "2",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Onyx Crush Powerbomb",
+          "range": "11-33"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Riot Rayne",
+        "sex": "Female",
+        "height": "5'7\"",
+        "weight": "145",
+        "hometown": "Belfast, Northern Ireland",
+        "tv_grade": "C",
+        "grudge_grade": 6,
+        "skills": {
+          "Mean": "STAR",
+          "Smart": "STAR",
+          "Strong": "STAR",
+          "Powerful": "STAR"
+        },
+        "specialty": {
+          "name": "Celtic Cross (fireman's carry drop)",
+          "points": "2",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Ragnarok Spinning Backfist",
+          "range": "11-33"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Harlequin Havoc",
+        "sex": "Female",
+        "height": "5'7\"",
+        "weight": "140",
+        "hometown": "New Orleans, LA",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Helped": "STAR",
+          "Favorite": "STAR",
+          "Object": "STAR"
+        },
+        "specialty": {
+          "name": "Mardi Gras Massacre (tilt-a-whirl headscissors)",
+          "points": "2",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Jack-In-The-Box Springboard Cutter",
+          "range": "11-32"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Crimson Queen",
+        "sex": "Female",
+        "height": "5'6\"",
+        "weight": "135",
+        "hometown": "London, England",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+          "Agile": "STAR",
+          "Mean": "STAR",
+          "Smart": "STAR",
+          "Object": "SQUARE",
+          "Quick": "CIRCLE"
+        },
+        "specialty": {
+          "name": "Royal Flush (enzuigiri)",
+          "points": "2",
+          "type": "STAR"
+        },
+        "finisher": {
+          "name": "Queen's Gambit Submission",
+          "range": "11-32"
+        },
+        "image": "placeholder.png"
+      },
+      {
+        "name": "Zuva",
+        "sex": "Female",
+        "height": "5'10\"",
+        "weight": "205",
+        "hometown": "Nairobi, Kenya",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+            "Heavy": "STAR",
+            "Strong": "CIRCLE",
+            "Helped": "STAR",
+            "Powerful": "SQUARE",
+            "Mean": "STAR"
+        },
+        "specialty": {
+            "name": "Savannah Slam (sitout powerbomb)",
+            "points": "2",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Nightfall Crush Bear Hug",
+            "range": "11-31"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Jennifer Phoenix",
+        "sex": "Female",
+        "height": "5'7\"",
+        "weight": "135",
+        "hometown": "Phoenix, AZ",
+        "tv_grade": "C",
+        "grudge_grade": 2,
+        "skills": {
+            "Helped": "CIRCLE",
+            "Mean": "SQUARE",
+            "Agile": "STAR",
+            "Powerful": "STAR",
+            "Smart": "STAR"
+        },
+        "specialty": {
+            "name": "Desert Heat (running bulldog)",
+            "points": "2",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Firebird DDT",
+            "range": "11-26"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Diabolica",
+        "sex": "Female",
+        "height": "6'0\"",
+        "weight": "290",
+        "hometown": "The Black Pits",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+            "Heavy": "STAR",
+            "Strong": "CIRCLE",
+            "Helped": "STAR",
+            "Cheat": "CIRCLE",
+            "Mean": "CIRCLE"
+        },
+        "specialty": {
+            "name": "Inferno Chokeslam (two-handed chokeslam)",
+            "points": "2",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Devil's Pitchfork Slam",
+            "range": "11-26"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Moonstone",
+        "sex": "Female",
+        "height": "5'6\"",
+        "weight": "165",
+        "hometown": "Wellington, New Zealand",
+        "tv_grade": "C",
+        "grudge_grade": 0,
+        "skills": {
+            "Heavy": "CIRCLE",
+            "Strong": "CIRCLE",
+            "Powerful": "STAR",
+            "Object": "SQUARE",
+            "Mean": "STAR"
+        },
+        "specialty": {
+            "name": "Kiwi Crush (jumping double stomp)",
+            "points": "2",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Lunar Eclipse Chest Kick",
+            "range": "11-25"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Raven Blackstone",
+        "sex": "Female",
+        "height": "5'6\"",
+        "weight": "135",
+        "hometown": "Salem MA",
+        "tv_grade": "D",
+        "grudge_grade": 0,
+        "skills": {
+            "Helped": "CIRCLE",
+            "Agile": "STAR",
+            "Quick": "STAR",
+            "Favorite": "CIRCLE"
+        },
+        "specialty": {
+            "name": "Witch's Brew (octopus hold)",
+            "points": "2",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Blackout Blitz Turnbuckle Diving Kick",
+            "range": "11-25"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Viper Rose",
+        "sex": "Female",
+        "height": "5'6\"",
+        "weight": "130",
+        "hometown": "Bangkok, Thailand",
+        "tv_grade": "D",
+        "grudge_grade": 0,
+        "skills": {
+            "Agile": "STAR",
+            "Cheat": "CIRCLE",
+            "Mean": "STAR",
+            "Quick": "SQUARE"
+        },
+        "specialty": {
+            "name": "Thorn Strike (spinning heel kick)",
+            "points": "1",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Serpent's Kiss Chin Kick",
+            "range": "11-25"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Shadow Striker",
+        "sex": "Female",
+        "height": "5'7\"",
+        "weight": "140",
+        "hometown": "Gotham City",
+        "tv_grade": "D",
+        "grudge_grade": 3,
+        "skills": {
+            "Agile": "CIRCLE",
+            "Cheat": "SQUARE",
+            "Quick": "CIRCLE",
+            "Object": "SQUARE",
+            "Mean": "SQUARE"
+        },
+        "specialty": {
+            "name": "Nightwing (flying clothesline)",
+            "points": "1",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Shadow's Grasp Submission",
+            "range": "11-24"
+        },
+        "image": "placeholder.png"
+        },
+        {
+        "name": "Raven LaRue",
+        "sex": "Female",
+        "height": "5'8\"",
+        "weight": "135",
+        "hometown": "New Orleans, LA",
+        "tv_grade": "E",
+        "grudge_grade": 4,
+        "skills": {
+            "Agile": "SQUARE",
+            "Cheat": "STAR",
+            "Quick": "STAR"
+        },
+        "specialty": {
+            "name": "Voodoo Vise (dragon sleeper)",
+            "points": "1",
+            "type": "STAR"
+        },
+        "finisher": {
+            "name": "Nevermore Neckbreaker",
+            "range": "11-24"
+        },
+        "image": "placeholder.png"
+        }
+    ]
+    }
