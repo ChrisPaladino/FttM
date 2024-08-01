@@ -134,8 +134,12 @@ class Game:
             return []
 
     def move_wrestler(self, wrestler, card):
-        if card.type == "Specialty":
-            points = int(wrestler.specialty.get('points', 0))
+        if card.type == "TV":
+            points = card.get_points(wrestler.tv_grade)
+        elif card.type == "Grudge":
+            points = card.get_points()  # Assuming Grudge cards have fixed points
+        elif card.type == "Specialty":
+            points = wrestler.specialty_points
         elif card.type == "Signature":
             points = self.roll_d6()
         else:
@@ -176,25 +180,20 @@ class Game:
         
         turn_result = f"{initial_control}\n{card_info}\n{result}\n{new_control}\n"
         
-        # Check for PIN or FINISHER opportunity only if a wrestler just moved
-        for wrestler in [self.favored_wrestler, self.underdog_wrestler]:
-            if wrestler.last_card_scored:
-                if wrestler.position in [12, 13, 14]:
-                    pin_result = self.attempt_pin()
-                    turn_result += f"\n{pin_result}"
-                    if "wins by pinfall" in pin_result:
-                        self.game_over = True
-                        return turn_result
-                elif wrestler.position == 15:
-                    finisher_result = self.attempt_finisher(wrestler)
-                    turn_result += f"\n{finisher_result}"
-                    if "They win the match" in finisher_result:
-                        self.game_over = True
-                        return turn_result
-        
-        # Reset last_card_scored for both wrestlers
-        self.favored_wrestler.last_card_scored = False
-        self.underdog_wrestler.last_card_scored = False
+        # Check for PIN or FINISHER opportunity only for the wrestler who just moved
+        active_wrestler = self.in_control  # Assuming the wrestler who just scored is now in control
+        if active_wrestler and active_wrestler.position in [12, 13, 14]:
+            pin_result = self.attempt_pin()
+            turn_result += f"\n{pin_result}"
+            if "wins by pinfall" in pin_result:
+                self.game_over = True
+                return turn_result
+        elif active_wrestler and active_wrestler.position == 15:
+            finisher_result = self.attempt_finisher(active_wrestler)
+            turn_result += f"\n{finisher_result}"
+            if "They win the match" in finisher_result:
+                self.game_over = True
+                return turn_result
         
         # Check if any wrestler has moved beyond position 15
         for wrestler in [self.favored_wrestler, self.underdog_wrestler]:
@@ -223,81 +222,41 @@ class Game:
             return f"Pre-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Use Highlight Reel 'R'"
 
     def resolve_card(self, card):
-        if card.control:
-            return self.resolve_in_control_card(card)
-        
-        if card.type == "Specialty":    
-            return self.resolve_specialty_card(card)
-        elif card.type == "TV":
-            return self.resolve_tv_card(card)
-        elif card.type == "Signature":
-            return self.resolve_signature_card(card)
-        elif card.type == "Grudge":
-            return self.resolve_grudge_card(card)
-        elif card.type == "Trailing":
-            return self.resolve_trailing_card(card)
-        
-        favored_can_use = self.favored_wrestler.can_use_skill(card.type, self.favored_wrestler.position)
-        underdog_can_use = self.underdog_wrestler.can_use_skill(card.type, self.underdog_wrestler.position)
-        
-        result = f"Card type: {card.type}\n"
-        result += f"Favored can use: {favored_can_use}\n"
-        result += f"Underdog can use: {underdog_can_use}\n"
-        
-        if favored_can_use and underdog_can_use:
-            result += "Both wrestlers can use this skill.\n"
-            result += self.resolve_tiebreaker(card)
-        elif favored_can_use:
-            result += "Favored wrestler can use this skill.\n"
-            result += self.move_wrestler(self.favored_wrestler, card)
-        elif underdog_can_use:
-            result += "Underdog wrestler can use this skill.\n"
-            result += self.move_wrestler(self.underdog_wrestler, card)
-        else:
-            result += "Neither wrestler can use this skill. No points scored."
-        
-        return result
+        result = f"Card drawn: {card.type} ({'Control' if card.control else 'No Control'})\n"
 
-    def resolve_grudge_card(self, card, preference=None):
+        if card.control and self.in_control:
+            return result + self.resolve_in_control_card(card)
+
+        if card.type == "TV":
+            return result + self.resolve_tv_card(card)
+        elif card.type == "Grudge":
+            return result + self.resolve_grudge_card(card)
+        elif card.type == "Specialty":
+            return result + self.resolve_specialty_card(card)
+        elif card.type == "Trailing":
+            return result + self.resolve_trailing_card(card)
+        else:
+            return result + self.resolve_skill_card(card)
+
+    def resolve_grudge_card(self, card):
         favored_grudge = self.favored_wrestler.grudge_grade
         underdog_grudge = self.underdog_wrestler.grudge_grade
-        result = f"Grudge card drawn.\n"
-        result += f"Favored wrestler's Grudge Grade: {favored_grudge}\n"
-        result += f"Underdog wrestler's Grudge Grade: {underdog_grudge}\n"
         
-        if favored_grudge > underdog_grudge or (favored_grudge == underdog_grudge and preference == self.favored_wrestler):
+        result = f"Comparing Grudge Grades: {self.favored_wrestler.name} ({favored_grudge}) vs {self.underdog_wrestler.name} ({underdog_grudge})\n"
+        
+        if favored_grudge > underdog_grudge:
             result += self.move_wrestler(self.favored_wrestler, card)
-        elif underdog_grudge > favored_grudge or (favored_grudge == underdog_grudge and preference == self.underdog_wrestler):
+        elif underdog_grudge > favored_grudge:
             result += self.move_wrestler(self.underdog_wrestler, card)
         else:
-            result += "Grudge grades are tied with no preference. Using tiebreaker.\n"
+            result += "Grudge Grades are equal. Using tiebreaker.\n"
             result += self.resolve_tiebreaker(card)
+        
         return result
 
     def resolve_in_control_card(self, card):
-        if not self.in_control:
-            return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card)
-        
-        in_control_wrestler = self.in_control
-        other_wrestler = self.underdog_wrestler if in_control_wrestler == self.favored_wrestler else self.favored_wrestler
-        
-        result = f"In-control card ({card.type}) for {in_control_wrestler.name}:\n"
-        
-        if in_control_wrestler.can_use_skill(card.type, in_control_wrestler.position):
-            result += self.move_wrestler(in_control_wrestler, card)
-        else:
-            new_card = self.draw_card()
-            result += f"{in_control_wrestler.name} can't use {card.type}. New card drawn: {new_card.type}\n"
-            
-            if other_wrestler.can_use_skill(new_card.type, other_wrestler.position):
-                result += self.move_wrestler(other_wrestler, new_card)
-            else:
-                result += f"Neither wrestler can use {new_card.type}. No points scored.\n"
-                result += "Continuing with next card as normal.\n"
-                next_card = self.draw_card()
-                result += self.resolve_card(next_card)
-        
-        return result
+        result = f"In-control card ({card.type}) for {self.in_control.name}:\n"
+        return result + self.move_wrestler(self.in_control, card)
     
     def resolve_signature_card(self, card):
         if self.in_control and self.in_control.last_card_scored:
@@ -306,6 +265,25 @@ class Game:
             return f"{self.in_control.name} used a Signature move and moved to position {self.in_control.position} (d6 roll: {roll})"
         else:
             return "No wrestler eligible for Signature move. No points scored."
+
+    def resolve_skill_card(self, card):
+        favored_can_use = self.favored_wrestler.can_use_skill(card.type, self.favored_wrestler.position)
+        underdog_can_use = self.underdog_wrestler.can_use_skill(card.type, self.underdog_wrestler.position)
+
+        result = f"Favored can use: {favored_can_use}\n"
+        result += f"Underdog can use: {underdog_can_use}\n"
+
+        if favored_can_use and underdog_can_use:
+            result += "Both wrestlers can use this skill.\n"
+            result += self.resolve_tiebreaker(card)
+        elif favored_can_use:
+            result += self.move_wrestler(self.favored_wrestler, card)
+        elif underdog_can_use:
+            result += self.move_wrestler(self.underdog_wrestler, card)
+        else:
+            result += "Neither wrestler can use this skill. No points scored."
+
+        return result
 
     def resolve_specialty_card(self, card, in_control_wrestler=None):
         result = "Specialty card drawn. "
@@ -368,16 +346,21 @@ class Game:
             return "Neither wrestler is trailing. No points scored."
 
     def resolve_tv_card(self, card):
-        tv_grades = ['AAA', 'AA', 'A', 'B', 'C', 'D', 'E']
+        tv_grades = ['AAA', 'AA', 'A', 'B', 'C', 'D', 'E', 'F']
         favored_grade = self.favored_wrestler.tv_grade
         underdog_grade = self.underdog_wrestler.tv_grade
         
+        result = f"Comparing TV Grades: {self.favored_wrestler.name} ({favored_grade}) vs {self.underdog_wrestler.name} ({underdog_grade})\n"
+        
         if tv_grades.index(favored_grade) < tv_grades.index(underdog_grade):
-            return self.move_wrestler(self.favored_wrestler, card)
+            result += self.move_wrestler(self.favored_wrestler, card)
         elif tv_grades.index(underdog_grade) < tv_grades.index(favored_grade):
-            return self.move_wrestler(self.underdog_wrestler, card)
+            result += self.move_wrestler(self.underdog_wrestler, card)
         else:
-            return self.resolve_tiebreaker(card)
+            result += "TV Grades are equal. Using tiebreaker.\n"
+            result += self.resolve_tiebreaker(card)
+        
+        return result
 
     def resolve_wrestler_in_control(self, card, favored_has_skill, underdog_has_skill):
         result = "Resolving In-Control card:\n"
@@ -499,7 +482,7 @@ class Wrestler:
 
     def can_use_skill(self, skill, position):
         skill = skill.lower()
-        if skill == 'grudge':
+        if skill in ["tv", "grudge", "specialty"]:
             return True
         if skill in self.skills:
             skill_type = self.skills[skill]
