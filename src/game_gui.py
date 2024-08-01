@@ -45,6 +45,22 @@ class GameGUI:
         self.log_text.delete(1.0, tk.END)
         self.log_text.config(state=tk.DISABLED)
 
+    def get_top_grudge_wrestlers(self, count=2):
+        involved_wrestlers = set([
+            self.favored_var.get(),
+            self.underdog_var.get(),
+            self.favored_ally_var.get(),
+            self.favored_foe_var.get(),
+            self.underdog_ally_var.get(),
+            self.underdog_foe_var.get(),
+            self.grudge1_var.get(),
+            self.grudge2_var.get()
+        ])
+        
+        available_wrestlers = [w for w in self.game.wrestlers if w.name not in involved_wrestlers]
+        sorted_wrestlers = sorted(available_wrestlers, key=lambda w: w.grudge_grade, reverse=True)
+        return sorted_wrestlers[:count]
+
     def play_turn(self):
         if not self.game.favored_wrestler or not self.game.underdog_wrestler:
             self.add_to_log("Please select wrestlers to begin the game.")
@@ -116,6 +132,13 @@ class GameGUI:
 
         self.grudge2_dropdown = ttk.Combobox(hot_box_frame, textvariable=self.grudge2_var)
         self.grudge2_dropdown.grid(row=2, column=3, columnspan=2, sticky="ew", padx=5, pady=2)
+
+        self.favored_ally_dropdown.bind("<<ComboboxSelected>>", self.update_favored_ally)
+        self.favored_foe_dropdown.bind("<<ComboboxSelected>>", self.update_favored_foe)
+        self.underdog_ally_dropdown.bind("<<ComboboxSelected>>", self.update_underdog_ally)
+        self.underdog_foe_dropdown.bind("<<ComboboxSelected>>", self.update_underdog_foe)
+        self.grudge1_dropdown.bind("<<ComboboxSelected>>", self.update_grudge1)
+        self.grudge2_dropdown.bind("<<ComboboxSelected>>", self.update_grudge2)
 
     def setup_match_controls(self):
         control_frame = ttk.Frame(self.master, padding="10")
@@ -283,6 +306,12 @@ class GameGUI:
         self.update_in_control_display()
         self.update_hot_box_display()
 
+    def update_favored_ally(self, event):
+        self.update_hot_box_dropdowns()
+
+    def update_favored_foe(self, event):
+        self.update_hot_box_dropdowns()
+
     def update_favored_wrestler(self, event):
         selected_name = self.favored_var.get()
         self.game.favored_wrestler = next(w for w in self.game.wrestlers if w.name == selected_name)
@@ -298,6 +327,12 @@ class GameGUI:
         self.add_to_log(result)
         self.update_display()
         self.update_wrestler_dropdowns()
+
+    def update_grudge1(self, event):
+        self.update_hot_box_dropdowns()
+
+    def update_grudge2(self, event):
+        self.update_hot_box_dropdowns()
 
     def update_hot_box_display(self):
         # Update the Hot Box information in your display
@@ -315,17 +350,20 @@ class GameGUI:
         wrestler_names = sorted([w.name for w in self.game.wrestlers])
         
         for dropdown in [self.favored_ally_dropdown, self.favored_foe_dropdown,
-                         self.underdog_ally_dropdown, self.underdog_foe_dropdown,
-                         self.grudge1_dropdown, self.grudge2_dropdown]:
+                         self.underdog_ally_dropdown, self.underdog_foe_dropdown]:
             if dropdown:  # Check if dropdown exists before updating
                 dropdown['values'] = wrestler_names
 
-        # Set default values for grudge wrestlers
-        grudge_wrestlers = sorted(self.game.wrestlers, key=lambda w: w.grudge_grade, reverse=True)[:2]
-        if self.grudge1_dropdown and grudge_wrestlers:
-            self.grudge1_var.set(grudge_wrestlers[0].name)
-        if self.grudge2_dropdown and len(grudge_wrestlers) > 1:
-            self.grudge2_var.set(grudge_wrestlers[1].name)
+        # Update grudge wrestler dropdowns
+        top_grudge_wrestlers = self.get_top_grudge_wrestlers(2)
+        if self.grudge1_dropdown:
+            self.grudge1_dropdown['values'] = wrestler_names
+            if top_grudge_wrestlers:
+                self.grudge1_var.set(top_grudge_wrestlers[0].name)
+        if self.grudge2_dropdown:
+            self.grudge2_dropdown['values'] = wrestler_names
+            if len(top_grudge_wrestlers) > 1:
+                self.grudge2_var.set(top_grudge_wrestlers[1].name)
 
     def update_in_control_display(self):
         if self.game.in_control == self.game.favored_wrestler:
@@ -335,6 +373,12 @@ class GameGUI:
         else:
             control_text = "Neither"
         self.in_control_var.set(control_text)
+
+    def update_underdog_ally(self, event):
+        self.update_hot_box_dropdowns()
+
+    def update_underdog_foe(self, event):
+        self.update_hot_box_dropdowns()
 
     def update_underdog_wrestler(self, event):
         selected_name = self.underdog_var.get()
