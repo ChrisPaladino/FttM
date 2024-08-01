@@ -9,21 +9,24 @@
       "tv_grade": "A",
       "grudge_grade": 0,
       "skills": {
-        "Agile": "STAR",
-        "Favorite": "STAR",
-        "Powerful": "STAR",
-        "Quick": "STAR",
-        "Smart": "SQUARE",
-        "Strong": "STAR"
+        "agile": "star",
+        "favorite": "star",
+        "powerful": "star",
+        "quick": "star",
+        "smart": "square",
+        "strong": "star"
       },
       "specialty": {
         "name": "Patriot Punch (overhand right)",
-        "points": "4",
+        "points": 4,
         "type": "STAR"
       },
       "finisher": {
         "name": "Stars and Stripes Slam",
-        "range": "11-45"
+        "range": [
+          11,
+          45
+        ]
       },
       "image": "placeholder.png"
     },
@@ -36,21 +39,24 @@
       "tv_grade": "B",
       "grudge_grade": 1,
       "skills": {
-        "Helped": "SQUARE",
-        "Mean": "STAR",
-        "Cheat": "STAR",
-        "Smart": "STAR",
-        "Agile": "STAR",
-        "Powerful": "STAR"
+        "helped": "square",
+        "mean": "star",
+        "cheat": "star",
+        "smart": "star",
+        "agile": "star",
+        "powerful": "star"
       },
       "specialty": {
         "name": "Coffin Drop (top rope senton)",
-        "points": "4",
+        "points": 4,
         "type": "STAR"
       },
       "finisher": {
         "name": "Grave's End Submission",
-        "range": "11-44"
+        "range": [
+          11,
+          44
+        ]
       },
       "image": "placeholder.png"
     },
@@ -63,21 +69,24 @@
       "tv_grade": "B",
       "grudge_grade": 0,
       "skills": {
-        "Agile": "STAR",
-        "Smart": "STAR",
-        "Quick": "STAR",
-        "Favorite": "STAR",
-        "Powerful": "STAR",
-        "Cheat": "SQUARE"
+        "agile": "star",
+        "smart": "star",
+        "quick": "star",
+        "favorite": "star",
+        "powerful": "star",
+        "cheat": "square"
       },
       "specialty": {
         "name": "Electric Slide (running dropkick)",
-        "points": "4",
+        "points": 4,
         "type": "STAR"
       },
       "finisher": {
         "name": "Spark Plug Corkscrew Shooting Star Press",
-        "range": "11-43"
+        "range": [
+          11,
+          43
+        ]
       },
       "image": "placeholder.png"
     },
@@ -90,20 +99,23 @@
       "tv_grade": "B",
       "grudge_grade": 0,
       "skills": {
-        "Strong": "STAR",
-        "Helped": "SQUARE",
-        "Powerful": "STAR",
-        "Mean": "SQUARE",
-        "Quick": "STAR"
+        "strong": "star",
+        "helped": "square",
+        "powerful": "star",
+        "mean": "square",
+        "quick": "star"
       },
       "specialty": {
         "name": "Lonestar Lariat (clothesline)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Brooke Breaker Spear",
-        "range": "11-43"
+        "range": [
+          11,
+          43
+        ]
       },
       "image": "placeholder.png"
     },
@@ -116,20 +128,23 @@
       "tv_grade": "C",
       "grudge_grade": 1,
       "skills": {
-        "Strong": "STAR",
-        "Mean": "STAR",
-        "Cheat": "STAR",
-        "Powerful": "STAR",
-        "Object": "STAR"
+        "strong": "star",
+        "mean": "star",
+        "cheat": "star",
+        "powerful": "star",
+        "object": "star"
       },
       "specialty": {
         "name": "Motor City Mayhem (running knee)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Blue Spike Piledriver",
-        "range": "11-43"
+        "range": [
+          11,
+          43
+        ]
       },
       "image": "placeholder.png"
     },
@@ -142,20 +157,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Helped": "STAR",
-        "Powerful": "STAR",
-        "Strong": "STAR",
-        "Smart": "CIRCLE",
-        "Favorite": "STAR"
+        "helped": "star",
+        "powerful": "star",
+        "strong": "star",
+        "smart": "circle",
+        "favorite": "star"
       },
       "specialty": {
         "name": "Sweet Chin Music (superkick)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Sugar Rush Spinning Backfist",
-        "range": "11-42"
+        "range": [
+          11,
+          42
+        ]
       },
       "image": "placeholder.png"
     },
@@ -168,20 +186,23 @@
       "tv_grade": "C",
       "grudge_grade": 6,
       "skills": {
-        "Helped": "STAR",
-        "Powerful": "STAR",
-        "Strong": "CIRCLE",
-        "Smart": "STAR",
-        "Favorite": "STAR"
+        "helped": "star",
+        "powerful": "star",
+        "strong": "circle",
+        "smart": "star",
+        "favorite": "star"
       },
       "specialty": {
         "name": "Jawbreaker (stunner)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Crusher Elbow Drop from Top Rope",
-        "range": "11-41"
+        "range": [
+          11,
+          41
+        ]
       },
       "image": "placeholder.png"
     },
@@ -194,21 +215,24 @@
       "tv_grade": "D",
       "grudge_grade": -2,
       "skills": {
-        "Strong": "STAR",
-        "Powerful": "STAR",
-        "Heavy": "SQUARE",
-        "Mean": "SQUARE",
-        "Smart": "STAR",
-        "Favorite": "SQUARE"
+        "strong": "star",
+        "powerful": "star",
+        "heavy": "square",
+        "mean": "square",
+        "smart": "star",
+        "favorite": "square"
       },
       "specialty": {
         "name": "Iron Maiden (Boston crab)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Steele Curtain Razor's Edge",
-        "range": "11-36"
+        "range": [
+          11,
+          36
+        ]
       },
       "image": "placeholder.png"
     },
@@ -221,20 +245,23 @@
       "tv_grade": "C",
       "grudge_grade": -1,
       "skills": {
-        "Helped": "SQUARE",
-        "Mean": "STAR",
-        "Cheat": "SQUARE",
-        "Smart": "STAR",
-        "Agile": "STAR"
+        "helped": "square",
+        "mean": "star",
+        "cheat": "square",
+        "smart": "star",
+        "agile": "star"
       },
       "specialty": {
         "name": "Solitary Lock (armbar)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Warden's Wrap Submission",
-        "range": "11-35"
+        "range": [
+          11,
+          35
+        ]
       },
       "image": "placeholder.png"
     },
@@ -247,19 +274,22 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Agile": "STAR",
-        "Mean": "STAR",
-        "Favorite": "STAR",
-        "Powerful": "STAR"
+        "agile": "star",
+        "mean": "star",
+        "favorite": "star",
+        "powerful": "star"
       },
       "specialty": {
         "name": "Radiation Lock (abdominal stretch)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Toxic Shock Side Slam",
-        "range": "11-35"
+        "range": [
+          11,
+          35
+        ]
       },
       "image": "placeholder.png"
     },
@@ -272,19 +302,22 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Agile": "STAR",
-        "Quick": "STAR",
-        "Smart": "STAR",
-        "Helped": "STAR"
+        "agile": "star",
+        "quick": "star",
+        "smart": "star",
+        "helped": "star"
       },
       "specialty": {
         "name": "Fluorescent Flash (handspring elbow)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Neon Nova Jumping Knee",
-        "range": "11-34"
+        "range": [
+          11,
+          34
+        ]
       },
       "image": "placeholder.png"
     },
@@ -297,20 +330,23 @@
       "tv_grade": "C",
       "grudge_grade": -3,
       "skills": {
-        "Agile": "STAR",
-        "Helped": "STAR",
-        "Mean": "STAR",
-        "Cheat": "CIRCLE",
-        "Object": "SQUARE"
+        "agile": "star",
+        "helped": "star",
+        "mean": "star",
+        "cheat": "circle",
+        "object": "square"
       },
       "specialty": {
         "name": "Holy Roller (rolling cutter)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Stigmata Jumping Slam",
-        "range": "11-34"
+        "range": [
+          11,
+          34
+        ]
       },
       "image": "placeholder.png"
     },
@@ -323,20 +359,23 @@
       "tv_grade": "C",
       "grudge_grade": -2,
       "skills": {
-        "Strong": "STAR",
-        "Powerful": "STAR",
-        "Mean": "SQUARE",
-        "Smart": "STAR",
-        "Quick": "CIRCLE"
+        "strong": "star",
+        "powerful": "star",
+        "mean": "square",
+        "smart": "star",
+        "quick": "circle"
       },
       "specialty": {
         "name": "Vine Swing (swinging neckbreaker)",
-        "points": "3",
+        "points": 3,
         "type": "STAR"
       },
       "finisher": {
         "name": "Savage Slam",
-        "range": "11-33"
+        "range": [
+          11,
+          33
+        ]
       },
       "image": "placeholder.png"
     },
@@ -349,20 +388,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Heavy": "CIRCLE",
-        "Strong": "STAR",
-        "Helped": "SQUARE",
-        "Powerful": "STAR",
-        "Favorite": "STAR"
+        "heavy": "circle",
+        "strong": "star",
+        "helped": "square",
+        "powerful": "star",
+        "favorite": "star"
       },
       "specialty": {
         "name": "Shield Maiden (running crossbody)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Angel's Kiss DDT",
-        "range": "11-33"
+        "range": [
+          11,
+          33
+        ]
       },
       "image": "placeholder.png"
     },
@@ -375,20 +417,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Heavy": "STAR",
-        "Strong": "CIRCLE",
-        "Powerful": "CIRCLE",
-        "Mean": "STAR",
-        "Helped": "STAR"
+        "heavy": "star",
+        "strong": "circle",
+        "powerful": "circle",
+        "mean": "star",
+        "helped": "star"
       },
       "specialty": {
         "name": "Diamond Cutter (jumping cutter)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Onyx Crush Powerbomb",
-        "range": "11-33"
+        "range": [
+          11,
+          33
+        ]
       },
       "image": "placeholder.png"
     },
@@ -401,19 +446,22 @@
       "tv_grade": "C",
       "grudge_grade": 4,
       "skills": {
-        "Mean": "STAR",
-        "Smart": "STAR",
-        "Strong": "STAR",
-        "Powerful": "STAR"
+        "mean": "star",
+        "smart": "star",
+        "strong": "star",
+        "powerful": "star"
       },
       "specialty": {
         "name": "Celtic Cross (fireman's carry drop)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Ragnarok Spinning Backfist",
-        "range": "11-33"
+        "range": [
+          11,
+          33
+        ]
       },
       "image": "placeholder.png"
     },
@@ -426,19 +474,22 @@
       "tv_grade": "C",
       "grudge_grade": 1,
       "skills": {
-        "Agile": "STAR",
-        "Helped": "STAR",
-        "Favorite": "STAR",
-        "Object": "STAR"
+        "agile": "star",
+        "helped": "star",
+        "favorite": "star",
+        "object": "star"
       },
       "specialty": {
         "name": "Mardi Gras Massacre (tilt-a-whirl headscissors)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Jack-In-The-Box Springboard Cutter",
-        "range": "11-32"
+        "range": [
+          11,
+          32
+        ]
       },
       "image": "placeholder.png"
     },
@@ -451,20 +502,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Agile": "STAR",
-        "Mean": "STAR",
-        "Smart": "STAR",
-        "Object": "SQUARE",
-        "Quick": "CIRCLE"
+        "agile": "star",
+        "mean": "star",
+        "smart": "star",
+        "object": "square",
+        "quick": "circle"
       },
       "specialty": {
         "name": "Royal Flush (enzuigiri)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Queen's Gambit Submission",
-        "range": "11-32"
+        "range": [
+          11,
+          32
+        ]
       },
       "image": "placeholder.png"
     },
@@ -477,20 +531,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Heavy": "STAR",
-        "Strong": "CIRCLE",
-        "Helped": "STAR",
-        "Powerful": "SQUARE",
-        "Mean": "STAR"
+        "heavy": "star",
+        "strong": "circle",
+        "helped": "star",
+        "powerful": "square",
+        "mean": "star"
       },
       "specialty": {
         "name": "Savannah Slam (sitout powerbomb)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Nightfall Crush Bear Hug",
-        "range": "11-31"
+        "range": [
+          11,
+          31
+        ]
       },
       "image": "placeholder.png"
     },
@@ -503,20 +560,23 @@
       "tv_grade": "F",
       "grudge_grade": 0,
       "skills": {
-        "Helped": "CIRCLE",
-        "Mean": "SQUARE",
-        "Agile": "STAR",
-        "Powerful": "STAR",
-        "Smart": "STAR"
+        "helped": "circle",
+        "mean": "square",
+        "agile": "star",
+        "powerful": "star",
+        "smart": "star"
       },
       "specialty": {
         "name": "Desert Heat (running bulldog)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Firebird DDT",
-        "range": "11-26"
+        "range": [
+          11,
+          26
+        ]
       },
       "image": "placeholder.png"
     },
@@ -529,20 +589,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Heavy": "STAR",
-        "Strong": "CIRCLE",
-        "Helped": "STAR",
-        "Cheat": "CIRCLE",
-        "Mean": "CIRCLE"
+        "heavy": "star",
+        "strong": "circle",
+        "helped": "star",
+        "cheat": "circle",
+        "mean": "circle"
       },
       "specialty": {
         "name": "Inferno Chokeslam (two-handed chokeslam)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Devil's Pitchfork Slam",
-        "range": "11-26"
+        "range": [
+          11,
+          26
+        ]
       },
       "image": "placeholder.png"
     },
@@ -555,20 +618,23 @@
       "tv_grade": "C",
       "grudge_grade": 0,
       "skills": {
-        "Heavy": "CIRCLE",
-        "Strong": "CIRCLE",
-        "Powerful": "STAR",
-        "Object": "SQUARE",
-        "Mean": "STAR"
+        "heavy": "circle",
+        "strong": "circle",
+        "powerful": "star",
+        "object": "square",
+        "mean": "star"
       },
       "specialty": {
         "name": "Kiwi Crush (jumping double stomp)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Lunar Eclipse Chest Kick",
-        "range": "11-25"
+        "range": [
+          11,
+          25
+        ]
       },
       "image": "placeholder.png"
     },
@@ -581,19 +647,22 @@
       "tv_grade": "D",
       "grudge_grade": 0,
       "skills": {
-        "Helped": "CIRCLE",
-        "Agile": "STAR",
-        "Quick": "STAR",
-        "Favorite": "CIRCLE"
+        "helped": "circle",
+        "agile": "star",
+        "quick": "star",
+        "favorite": "circle"
       },
       "specialty": {
         "name": "Witch's Brew (octopus hold)",
-        "points": "2",
+        "points": 2,
         "type": "STAR"
       },
       "finisher": {
         "name": "Blackout Blitz Turnbuckle Diving Kick",
-        "range": "11-25"
+        "range": [
+          11,
+          25
+        ]
       },
       "image": "placeholder.png"
     },
@@ -606,19 +675,22 @@
       "tv_grade": "D",
       "grudge_grade": 0,
       "skills": {
-        "Agile": "STAR",
-        "Cheat": "CIRCLE",
-        "Mean": "STAR",
-        "Quick": "SQUARE"
+        "agile": "star",
+        "cheat": "circle",
+        "mean": "star",
+        "quick": "square"
       },
       "specialty": {
         "name": "Thorn Strike (spinning heel kick)",
-        "points": "1",
+        "points": 1,
         "type": "STAR"
       },
       "finisher": {
         "name": "Serpent's Kiss Chin Kick",
-        "range": "11-25"
+        "range": [
+          11,
+          25
+        ]
       },
       "image": "placeholder.png"
     },
@@ -631,20 +703,23 @@
       "tv_grade": "D",
       "grudge_grade": 1,
       "skills": {
-        "Agile": "CIRCLE",
-        "Cheat": "SQUARE",
-        "Quick": "CIRCLE",
-        "Object": "SQUARE",
-        "Mean": "SQUARE"
+        "agile": "circle",
+        "cheat": "square",
+        "quick": "circle",
+        "object": "square",
+        "mean": "square"
       },
       "specialty": {
         "name": "Nightwing (flying clothesline)",
-        "points": "1",
+        "points": 1,
         "type": "STAR"
       },
       "finisher": {
         "name": "Shadow's Grasp Submission",
-        "range": "11-24"
+        "range": [
+          11,
+          24
+        ]
       },
       "image": "placeholder.png"
     },
@@ -657,18 +732,21 @@
       "tv_grade": "E",
       "grudge_grade": 4,
       "skills": {
-        "Agile": "SQUARE",
-        "Cheat": "STAR",
-        "Quick": "STAR"
+        "agile": "square",
+        "cheat": "star",
+        "quick": "star"
       },
       "specialty": {
         "name": "Voodoo Vise (dragon sleeper)",
-        "points": "1",
+        "points": 1,
         "type": "STAR"
       },
       "finisher": {
         "name": "Nevermore Neckbreaker",
-        "range": "11-24"
+        "range": [
+          11,
+          24
+        ]
       },
       "image": "placeholder.png"
     }

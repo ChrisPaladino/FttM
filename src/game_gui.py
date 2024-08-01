@@ -31,8 +31,7 @@ class GameGUI:
         self.setup_gui()
         self.setup_match_controls()
         self.setup_hot_box()
-        
-        # Now that all UI elements are created, update the dropdowns
+        self.setup_grade_update_controls()
         self.update_wrestler_dropdowns()
 
     def add_to_log(self, message):
@@ -149,6 +148,24 @@ class GameGUI:
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number for the position")
 
+    def setup_grade_update_controls(self):
+        update_frame = ttk.Frame(self.master, padding="10")
+        update_frame.grid(row=3, column=0, columnspan=3, sticky="ew")
+
+        ttk.Label(update_frame, text="Update Grade:").grid(row=0, column=0, sticky="w")
+        self.update_wrestler_var = tk.StringVar()
+        self.update_wrestler_dropdown = ttk.Combobox(update_frame, textvariable=self.update_wrestler_var)
+        self.update_wrestler_dropdown.grid(row=0, column=1, sticky="ew")
+
+        self.grade_type_var = tk.StringVar(value="GRUDGE")
+        ttk.Radiobutton(update_frame, text="Grudge", variable=self.grade_type_var, value="GRUDGE").grid(row=0, column=2)
+        ttk.Radiobutton(update_frame, text="TV", variable=self.grade_type_var, value="TV").grid(row=0, column=3)
+
+        self.new_grade_var = tk.StringVar()
+        ttk.Entry(update_frame, textvariable=self.new_grade_var, width=5).grid(row=0, column=4)
+
+        ttk.Button(update_frame, text="Update Grade", command=self.update_grade).grid(row=0, column=5, padx=5)
+
     def setup_gui(self):
         self.master.title("Face to the Mat")
         self.master.geometry("825x650")
@@ -211,6 +228,7 @@ class GameGUI:
         self.board_canvas = tk.Canvas(right_frame, width=100, height=400)
         self.board_canvas.pack(fill=tk.BOTH, expand=True)
 
+        self.setup_grade_update_controls()
         self.update_display()
 
     def show_match_end_dialog(self, result):
@@ -271,6 +289,16 @@ class GameGUI:
         self.update_display()
         self.update_hot_box_dropdowns()
 
+    def update_grade(self):
+        wrestler_name = self.update_wrestler_var.get()
+        grade_type = self.grade_type_var.get()
+        new_value = self.new_grade_var.get()
+
+        result = self.game.update_wrestler_grade(wrestler_name, grade_type, new_value)
+        messagebox.showinfo("Grade Update", result)
+        self.update_display()
+        self.update_wrestler_dropdowns()
+
     def update_hot_box_display(self):
         # Update the Hot Box information in your display
         hot_box_info = f"Hot Box:\n"
@@ -321,6 +349,9 @@ class GameGUI:
         if self.underdog_dropdown:
             self.underdog_dropdown['values'] = wrestler_names
         self.update_hot_box_dropdowns()
+        
+        if self.update_wrestler_dropdown:
+            self.update_wrestler_dropdown['values'] = wrestler_names        
 
     def update_wrestler_info(self):
         info_text = ""

@@ -410,6 +410,28 @@ class Game:
     def roll_d66(self):
         return random.randint(1, 6) * 10 + random.randint(1, 6)
     
+    def save_wrestlers(self):
+        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'wrestlers', 'wrestlers.json')
+        data = {"wrestlers": []}
+        for wrestler in self.wrestlers:
+            wrestler_data = {
+                "name": wrestler.name,
+                "sex": wrestler.sex,
+                "height": wrestler.height,
+                "weight": wrestler.weight,
+                "hometown": wrestler.hometown,
+                "tv_grade": wrestler.tv_grade,
+                "grudge_grade": wrestler.grudge_grade,
+                "skills": wrestler.skills,
+                "specialty": wrestler.specialty,
+                "finisher": wrestler.finisher,
+                "image": wrestler.image
+            }
+            data["wrestlers"].append(wrestler_data)
+        
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+    
     def set_in_control(self, wrestler):
         if wrestler == self.favored_wrestler:
             self.in_control = "Favored"
@@ -429,6 +451,17 @@ class Game:
             print("Error: Wrestlers not selected")
             return
         self.load_and_shuffle_deck()
+
+    def update_wrestler_grade(self, wrestler_name, grade_type, new_value):
+        wrestler = next((w for w in self.wrestlers if w.name == wrestler_name), None)
+        if wrestler:
+            if grade_type.upper() == "GRUDGE":
+                wrestler.grudge_grade = int(new_value)
+            elif grade_type.upper() == "TV":
+                wrestler.tv_grade = new_value
+            self.save_wrestlers()
+            return f"Updated {wrestler_name}'s {grade_type} grade to {new_value}"
+        return f"Wrestler {wrestler_name} not found"
 
 class Wrestler:
     def __init__(self, game, name, sex, height, weight, hometown, tv_grade, grudge_grade, skills, specialty, finisher, image="placeholder.png"):
