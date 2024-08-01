@@ -168,7 +168,7 @@ class GameGUI:
 
     def setup_gui(self):
         self.master.title("Face to the Mat")
-        self.master.geometry("825x650")
+        self.master.geometry("825x725")
 
         # Main frame
         main_frame = ttk.Frame(self.master, padding="10")
@@ -295,7 +295,7 @@ class GameGUI:
         new_value = self.new_grade_var.get()
 
         result = self.game.update_wrestler_grade(wrestler_name, grade_type, new_value)
-        messagebox.showinfo("Grade Update", result)
+        self.add_to_log(result)
         self.update_display()
         self.update_wrestler_dropdowns()
 

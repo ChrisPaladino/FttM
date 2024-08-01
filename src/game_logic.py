@@ -427,11 +427,13 @@ class Game:
                 "finisher": wrestler.finisher,
                 "image": wrestler.image
             }
+            # Convert finisher range to list for JSON serialization
+            if wrestler_data["finisher"] and "range" in wrestler_data["finisher"]:
+                wrestler_data["finisher"]["range"] = list(wrestler_data["finisher"]["range"])
             data["wrestlers"].append(wrestler_data)
         
         with open(file_path, 'w') as f:
-            json.dump(data, f, indent=2)
-    
+            json.dump(data, f, indent=2)    
     def set_in_control(self, wrestler):
         if wrestler == self.favored_wrestler:
             self.in_control = "Favored"
@@ -455,11 +457,13 @@ class Game:
     def update_wrestler_grade(self, wrestler_name, grade_type, new_value):
         wrestler = next((w for w in self.wrestlers if w.name == wrestler_name), None)
         if wrestler:
+            old_value = wrestler.grudge_grade if grade_type.upper() == "GRUDGE" else wrestler.tv_grade
             if grade_type.upper() == "GRUDGE":
                 wrestler.grudge_grade = int(new_value)
             elif grade_type.upper() == "TV":
                 wrestler.tv_grade = new_value
             self.save_wrestlers()
+            print(f"Updated {wrestler_name}'s {grade_type} grade from {old_value} to {new_value}")
             return f"Updated {wrestler_name}'s {grade_type} grade to {new_value}"
         return f"Wrestler {wrestler_name} not found"
 
@@ -482,7 +486,10 @@ class Wrestler:
                 self.specialty['points'] = 0
         self.finisher = finisher
         if self.finisher and 'range' in self.finisher:
-            self.finisher['range'] = tuple(map(int, self.finisher['range'].split('-')))
+            if isinstance(self.finisher['range'], list):
+                self.finisher['range'] = tuple(self.finisher['range'])
+            elif isinstance(self.finisher['range'], str):
+                self.finisher['range'] = tuple(map(int, self.finisher['range'].split('-')))
         self.image = image
         self.position = 0
         self.last_card_scored = False
