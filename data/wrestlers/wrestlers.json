@@ -97,7 +97,7 @@
       "weight": "185",
       "hometown": "Austin, TX",
       "tv_grade": "B",
-      "grudge_grade": 0,
+      "grudge_grade": -2,
       "skills": {
         "strong": "star",
         "helped": "square",

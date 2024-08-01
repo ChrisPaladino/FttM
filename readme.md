@@ -2,6 +2,8 @@
 - https://brackethq.com/b/x5n6b/
 
 #### Implement
+- Show full card text in the log.
+- Only show changes in IN CONTROL wrestler
 - Hot Box:
     - Need to implement ALLY and FOE in the Wrestler JSON
 - Explain how Signature is resolved?
