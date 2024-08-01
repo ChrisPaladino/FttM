@@ -69,10 +69,6 @@ class GameGUI:
         self.add_to_log(result)
         self.update_display()
         self.update_in_control_display()  # Update the display after each turn
-    
-        if self.game.game_over:
-            self.action_button.config(state="disabled")
-            self.show_match_end_dialog(result)
 
     def post_match_roll(self):
         winner = messagebox.askquestion("Winner", "Did the Face win?")

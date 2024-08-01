@@ -1,6 +1,8 @@
+#### Tourney
+- https://brackethq.com/b/x5n6b/
+
 #### Implement
 - Hot Box:
-    - Grudge doesn't update if the wrestler is involved in the match
     - Need to implement ALLY and FOE in the Wrestler JSON
 - Explain how Signature is resolved?
     - We may need to have In-Control only for the 1 previous FAC, not a running total.

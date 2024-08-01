@@ -272,7 +272,7 @@
       "weight": "145",
       "hometown": "Chernobyl, Ukraine",
       "tv_grade": "C",
-      "grudge_grade": 0,
+      "grudge_grade": 3,
       "skills": {
         "agile": "star",
         "mean": "star",
@@ -386,7 +386,7 @@
       "weight": "185",
       "hometown": "Oslo, Norway",
       "tv_grade": "C",
-      "grudge_grade": 0,
+      "grudge_grade": 3,
       "skills": {
         "heavy": "circle",
         "strong": "star",
@@ -557,7 +557,7 @@
       "height": "5'7\"",
       "weight": "135",
       "hometown": "Phoenix, AZ",
-      "tv_grade": "F",
+      "tv_grade": "E",
       "grudge_grade": 0,
       "skills": {
         "helped": "circle",
@@ -644,8 +644,8 @@
       "height": "5'6\"",
       "weight": "135",
       "hometown": "Salem MA",
-      "tv_grade": "D",
-      "grudge_grade": 0,
+      "tv_grade": "C",
+      "grudge_grade": 3,
       "skills": {
         "helped": "circle",
         "agile": "star",
@@ -730,7 +730,7 @@
       "weight": "135",
       "hometown": "New Orleans, LA",
       "tv_grade": "E",
-      "grudge_grade": 4,
+      "grudge_grade": 6,
       "skills": {
         "agile": "square",
         "cheat": "star",

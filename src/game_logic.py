@@ -157,12 +157,9 @@ class Game:
         result += f"and moved to position {wrestler.position} (+{points} points)"
 
         if points > 0:
-            self.in_control = wrestler  # Set the in-control wrestler only if points were scored
+            self.in_control = wrestler
             result += f"\n{wrestler.name} is now in control."
         
-        other_wrestler = self.underdog_wrestler if wrestler == self.favored_wrestler else self.favored_wrestler
-        other_wrestler.last_card_scored = False
-        wrestler.last_card_scored = True
         return result
 
     def play_turn(self):
@@ -225,8 +222,8 @@ class Game:
         else:
             return f"Pre-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Use Highlight Reel 'R'"
 
-    def resolve_card(self, card, is_from_in_control=False):
-        if card.control and self.in_control:
+    def resolve_card(self, card):
+        if card.control:
             return self.resolve_in_control_card(card)
         
         if card.type == "Specialty":    
@@ -279,23 +276,28 @@ class Game:
 
     def resolve_in_control_card(self, card):
         if not self.in_control:
-            return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card, is_from_in_control=True)
+            return "No wrestler in control. Treating as a normal card.\n" + self.resolve_card(card)
         
         in_control_wrestler = self.in_control
         other_wrestler = self.underdog_wrestler if in_control_wrestler == self.favored_wrestler else self.favored_wrestler
         
         result = f"In-control card ({card.type}) for {in_control_wrestler.name}:\n"
         
-        if card.type == "Specialty" or in_control_wrestler.can_use_skill(card.type, in_control_wrestler.position):
-            return result + self.move_wrestler(in_control_wrestler, card)
-        
-        new_card = self.draw_card()
-        result += f"{in_control_wrestler.name} can't use {card.type}. New card drawn: {new_card.type}\n"
-        
-        if new_card.type in ["TV", "Grudge", "Specialty"] or other_wrestler.can_use_skill(new_card.type, other_wrestler.position):
-            return result + self.move_wrestler(other_wrestler, new_card)
+        if in_control_wrestler.can_use_skill(card.type, in_control_wrestler.position):
+            result += self.move_wrestler(in_control_wrestler, card)
         else:
-            return result + f"{other_wrestler.name} can't use {new_card.type}. No points scored."
+            new_card = self.draw_card()
+            result += f"{in_control_wrestler.name} can't use {card.type}. New card drawn: {new_card.type}\n"
+            
+            if other_wrestler.can_use_skill(new_card.type, other_wrestler.position):
+                result += self.move_wrestler(other_wrestler, new_card)
+            else:
+                result += f"Neither wrestler can use {new_card.type}. No points scored.\n"
+                result += "Continuing with next card as normal.\n"
+                next_card = self.draw_card()
+                result += self.resolve_card(next_card)
+        
+        return result
     
     def resolve_signature_card(self, card):
         if self.in_control and self.in_control.last_card_scored:
