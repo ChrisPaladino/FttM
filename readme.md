@@ -1,11 +1,13 @@
-#### Tourney
+#### GCW Women's tourney
 - https://brackethq.com/b/x5n6b/
 
 #### Implement
 - Show full card text in the log.
 - Only show changes in IN CONTROL wrestler
 - Hot Box:
+    - Grudge doesn't update if the wrestler is involved in the match
     - Need to implement ALLY and FOE in the Wrestler JSON
+    - Need a way to do pre-match tweaks (TV Grade, Grudge Grade), and maybe Mid-Match as well?
 - Explain how Signature is resolved?
     - We may need to have In-Control only for the 1 previous FAC, not a running total.
     - An alternative is that the Signature gives more points to whoever was in control
