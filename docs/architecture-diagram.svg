@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">Face to the Mat - System Architecture</text>
+  
+  <!-- Main Application -->
+  <rect x="300" y="70" width="200" height="80" rx="10" fill="#c7e9b4" stroke="#43a047" stroke-width="2"/>
+  <text x="400" y="110" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">main.py</text>
+  <text x="400" y="130" font-family="Arial" font-size="12" text-anchor="middle">Application Entry Point</text>
+  
+  <!-- Core Components -->
+  <rect x="100" y="200" width="180" height="100" rx="10" fill="#bbdefb" stroke="#1976d2" stroke-width="2"/>
+  <text x="190" y="230" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">game_logic.py</text>
+  <text x="190" y="255" font-family="Arial" font-size="12" text-anchor="middle">Game Logic</text>
+  <text x="190" y="275" font-family="Arial" font-size="12" text-anchor="middle">- Match Mechanics</text>
+  <text x="190" y="290" font-family="Arial" font-size="12" text-anchor="middle">- Card Resolution</text>
+  
+  <rect x="520" y="200" width="180" height="100" rx="10" fill="#ffccbc" stroke="#e64a19" stroke-width="2"/>
+  <text x="610" y="230" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">game_gui.py</text>
+  <text x="610" y="255" font-family="Arial" font-size="12" text-anchor="middle">User Interface</text>
+  <text x="610" y="275" font-family="Arial" font-size="12" text-anchor="middle">- Match Display</text>
+  <text x="610" y="290" font-family="Arial" font-size="12" text-anchor="middle">- User Controls</text>
+  
+  <!-- Data Components -->
+  <rect x="100" y="350" width="180" height="100" rx="10" fill="#e1bee7" stroke="#8e24aa" stroke-width="2"/>
+  <text x="190" y="380" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">fac_deck.json</text>
+  <text x="190" y="405" font-family="Arial" font-size="12" text-anchor="middle">Action Cards</text>
+  <text x="190" y="425" font-family="Arial" font-size="12" text-anchor="middle">- Move Types</text>
+  <text x="190" y="440" font-family="Arial" font-size="12" text-anchor="middle">- Point Values</text>
+  
+  <rect x="520" y="350" width="180" height="100" rx="10" fill="#e1bee7" stroke="#8e24aa" stroke-width="2"/>
+  <text x="610" y="380" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">wrestlers.json</text>
+  <text x="610" y="405" font-family="Arial" font-size="12" text-anchor="middle">Wrestler Data</text>
+  <text x="610" y="425" font-family="Arial" font-size="12" text-anchor="middle">- Attributes</text>
+  <text x="610" y="440" font-family="Arial" font-size="12" text-anchor="middle">- Skills & Moves</text>
+  
+  <!-- Utility Components -->
+  <rect x="310" y="350" width="180" height="100" rx="10" fill="#fff9c4" stroke="#fbc02d" stroke-width="2"/>
+  <text x="400" y="380" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">wrestler_editor.py</text>
+  <text x="400" y="405" font-family="Arial" font-size="12" text-anchor="middle">Editor Interface</text>
+  <text x="400" y="425" font-family="Arial" font-size="12" text-anchor="middle">- Create Wrestlers</text>
+  <text x="400" y="440" font-family="Arial" font-size="12" text-anchor="middle">- Edit Attributes</text>
+  
+  <!-- Connections -->
+  <!-- Main to Components -->
+  <line x1="400" y1="150" x2="190" y2="200" stroke="#555" stroke-width="2"/>
+  <line x1="400" y1="150" x2="610" y2="200" stroke="#555" stroke-width="2"/>
+  
+  <!-- Logic to Data -->
+  <line x1="190" y1="300" x2="190" y2="350" stroke="#555" stroke-width="2"/>
+  <line x1="190" y1="300" x2="520" y2="370" stroke="#555" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- GUI to Logic -->
+  <line x1="520" y1="250" x2="280" y2="250" stroke="#555" stroke-width="2"/>
+  
+  <!-- GUI to Editor -->
+  <line x1="560" y1="300" x2="400" y2="350" stroke="#555" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- Editor to Data -->
+  <line x1="400" y1="450" x2="520" y2="450" stroke="#555" stroke-width="2"/>
+  
+  <!-- Legend -->
+  <rect x="600" y="500" width="20" height="10" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+  <text x="625" y="510" font-family="Arial" font-size="12" text-anchor="start">Core Logic</text>
+  
+  <rect x="600" y="520" width="20" height="10" fill="#ffccbc" stroke="#e64a19" stroke-width="1"/>
+  <text x="625" y="530" font-family="Arial" font-size="12" text-anchor="start">User Interface</text>
+  
+  <rect x="600" y="540" width="20" height="10" fill="#e1bee7" stroke="#8e24aa" stroke-width="1"/>
+  <text x="625" y="550" font-family="Arial" font-size="12" text-anchor="start">Data Files</text>
+  
+  <rect x="600" y="560" width="20" height="10" fill="#fff9c4" stroke="#fbc02d" stroke-width="1"/>
+  <text x="625" y="570" font-family="Arial" font-size="12" text-anchor="start">Utility Tools</text>
+
+  <line x1="600" y1="585" x2="620" y2="585" stroke="#555" stroke-width="2"/>
+  <text x="625" y="590" font-family="Arial" font-size="12" text-anchor="start">Direct Dependency</text>
+  
+  <line x1="600" y1="605" x2="620" y2="605" stroke="#555" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="625" y="610" font-family="Arial" font-size="12" text-anchor="start">Optional/Indirect</text>
+</svg>
