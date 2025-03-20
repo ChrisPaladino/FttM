@@ -1,14 +1,25 @@
+"""
+Face to the Mat - Wrestler Manager
+This module handles wrestler data loading, saving, and management.
+"""
 import json
 import os
+import logging
 from typing import Dict, List, Union, Optional, Tuple, Any
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("face_to_the_mat")
+
 class Wrestler:
+    """Represents a wrestler with all their attributes and state"""
+    
     def __init__(self, name: str, sex: str, height: str, weight: str, hometown: str,
                  tv_grade: str, grudge_grade: Union[int, str], skills: Dict[str, str],
                  specialty: Optional[Dict] = None, finisher: Optional[Dict] = None,
                  image: str = "placeholder.png", allies: Optional[List[str]] = None,
-                 rivals: Optional[List[str]] = None, game=None):
-        self.game = game
+                 rivals: Optional[List[str]] = None):
+        """Initialize a wrestler with their attributes"""
         self.name = name
         self.sex = sex
         self.height = height
@@ -43,10 +54,12 @@ class Wrestler:
                 self.finisher['range'] = tuple(self.finisher['range'])
             elif isinstance(self.finisher['range'], str):
                 try:
-                    self.finisher['range'] = tuple(map(int, self.finisher['range'].split('-')))
+                    parts = str(self.finisher['range']).split('-')
+                    self.finisher['range'] = (int(parts[0]), int(parts[1]))
                 except (ValueError, AttributeError):
                     self.finisher['range'] = (11, 33)  # Default range if parsing fails
         
+        # Match tracking attributes
         self.image = image
         self.position = 0
         self.last_card_scored = False
@@ -56,17 +69,10 @@ class Wrestler:
         self.allies = allies or []
         self.rivals = rivals or []
 
-    def resolve_title_holder_card(self, card: Card) -> str:
-        if not self.in_control:
-            return "No wrestler is in control. Cannot resolve Title Holder card."
-            
-        if not self.in_control.is_title_holder:
-            return f"{self.in_control.name} is not a title holder. No points scored."
-        
-        # Only title holders can use this card
-        return self.move_wrestler(self.in_control, card)
-
     def can_use_skill(self, skill: str, position: int) -> bool:
+        """
+        Determine if the wrestler can use a specific skill at their current position
+        """
         skill = skill.lower()
         
         # Special skills that can always be used
@@ -92,41 +98,50 @@ class Wrestler:
         return False
 
     def has_skill(self, skill: str) -> bool:
+        """Check if the wrestler has a specific skill"""
         return skill.lower() in self.skills
 
     def has_specialty(self) -> bool:
+        """Check if the wrestler has a specialty move defined"""
         return bool(self.specialty and self.specialty.get('name') and self.specialty.get('points'))
 
     def is_trailing(self, opponent) -> bool:
-        return (self.position < opponent.position or 
-                (self.position == opponent.position and self == self.game.underdog_wrestler))
+        """Check if this wrestler is trailing behind the opponent"""
+        return self.position < opponent.position
 
     def score(self, points: int) -> None:
+        """Update wrestler position by adding points"""
         self.position += points
-        self.position = min(self.position, 15)
+        self.position = min(self.position, 15)  # Ensure position doesn't exceed 15
         self.last_card_scored = True
 
     @property
     def specialty_points(self) -> int:
+        """Get the points value for this wrestler's specialty move"""
         return int(self.specialty.get('points', 0))
 
     def add_ally(self, ally_name: str) -> None:
+        """Add a wrestler as an ally"""
         if ally_name not in self.allies and ally_name != self.name:
             self.allies.append(ally_name)
 
     def add_rival(self, rival_name: str) -> None:
+        """Add a wrestler as a rival"""
         if rival_name not in self.rivals and rival_name != self.name:
             self.rivals.append(rival_name)
 
     def remove_ally(self, ally_name: str) -> None:
+        """Remove a wrestler from allies"""
         if ally_name in self.allies:
             self.allies.remove(ally_name)
 
     def remove_rival(self, rival_name: str) -> None:
+        """Remove a wrestler from rivals"""
         if rival_name in self.rivals:
             self.rivals.remove(rival_name)
     
     def to_dict(self) -> Dict:
+        """Convert wrestler object to dictionary for serialization"""
         wrestler_dict = {
             "name": self.name,
             "sex": self.sex,
@@ -152,8 +167,10 @@ class Wrestler:
 
 
 class WrestlerManager:
-    def __init__(self, data_path: Optional[str] = None, game=None):
-        self.game = game
+    """Manages the collection of wrestlers, handling loading and saving"""
+    
+    def __init__(self, data_path: Optional[str] = None):
+        """Initialize the wrestler manager"""
         self.wrestlers: List[Wrestler] = []
         
         if data_path is None:
@@ -167,6 +184,7 @@ class WrestlerManager:
         self.load_wrestlers()
     
     def load_wrestlers(self) -> None:
+        """Load wrestlers from the JSON file"""
         try:
             with open(self.data_path, 'r') as f:
                 data = json.load(f)
@@ -174,65 +192,85 @@ class WrestlerManager:
             self.wrestlers = []
             for w in data['wrestlers']:
                 # Handle allies and rivals if they exist in the data
-                allies = w.get('allies', [])
-                rivals = w.get('rivals', [])
+                allies = w.pop('allies', []) if 'allies' in w else []
+                rivals = w.pop('rivals', []) if 'rivals' in w else []
                 
-                wrestler = Wrestler(game=self.game, allies=allies, rivals=rivals, **w)
+                wrestler = Wrestler(allies=allies, rivals=rivals, **w)
                 self.wrestlers.append(wrestler)
                 
+            logger.info(f"Loaded {len(self.wrestlers)} wrestlers from {self.data_path}")
         except FileNotFoundError:
-            print(f"Error: wrestlers.json not found at {self.data_path}")
+            logger.error(f"Error: wrestlers.json not found at {self.data_path}")
             self.wrestlers = []
         except json.JSONDecodeError:
-            print(f"Error: Invalid JSON in wrestlers.json")
+            logger.error(f"Error: Invalid JSON in wrestlers.json")
             self.wrestlers = []
     
     def save_wrestlers(self) -> None:
+        """Save all wrestlers to the JSON file"""
         data = {"wrestlers": [w.to_dict() for w in self.wrestlers]}
         
         os.makedirs(os.path.dirname(self.data_path), exist_ok=True)
         
         with open(self.data_path, 'w') as f:
             json.dump(data, f, indent=2)
+        
+        logger.info(f"Saved {len(self.wrestlers)} wrestlers to {self.data_path}")
     
     def add_wrestler(self, wrestler: Wrestler) -> None:
+        """Add a wrestler to the collection"""
         self.wrestlers.append(wrestler)
     
     def remove_wrestler(self, wrestler_name: str) -> None:
+        """Remove a wrestler by name"""
         self.wrestlers = [w for w in self.wrestlers if w.name != wrestler_name]
     
     def get_wrestler(self, wrestler_name: str) -> Optional[Wrestler]:
+        """Get a wrestler by name"""
         for w in self.wrestlers:
             if w.name == wrestler_name:
                 return w
         return None
     
     def get_wrestlers_by_tv_grade(self, tv_grade: str) -> List[Wrestler]:
+        """Get all wrestlers with a specific TV grade"""
         return [w for w in self.wrestlers if w.tv_grade == tv_grade]
     
-    def get_top_grudge_wrestlers(self, count: int = 2) -> List[Wrestler]:
-        return sorted(self.wrestlers, key=lambda w: w.grudge_grade, reverse=True)[:count]
+    def get_top_grudge_wrestlers(self, count: int = 2, excluded_names: List[str] = None) -> List[Wrestler]:
+        """Get the top wrestlers by grudge grade, excluding specified wrestlers"""
+        excluded = set(excluded_names or [])
+        eligible_wrestlers = [w for w in self.wrestlers if w.name not in excluded]
+        return sorted(eligible_wrestlers, key=lambda w: abs(w.grudge_grade), reverse=True)[:count]
     
     def get_available_opponents(self, wrestler: Wrestler) -> List[Wrestler]:
+        """Get wrestlers that are suitable opponents based on TV grade"""
         # Get wrestlers within one TV grade up or down
         tv_grades = ["AAA", "AA", "A", "B", "C", "D", "E", "F"]
-        wrestler_index = tv_grades.index(wrestler.tv_grade)
-        
-        min_index = max(0, wrestler_index - 1)
-        max_index = min(len(tv_grades) - 1, wrestler_index + 1)
-        
-        valid_grades = tv_grades[min_index:max_index + 1]
-        
-        return [w for w in self.wrestlers 
-                if w.tv_grade in valid_grades and w.name != wrestler.name]
+        try:
+            wrestler_index = tv_grades.index(wrestler.tv_grade)
+            
+            min_index = max(0, wrestler_index - 1)
+            max_index = min(len(tv_grades) - 1, wrestler_index + 1)
+            
+            valid_grades = tv_grades[min_index:max_index + 1]
+            
+            return [w for w in self.wrestlers 
+                    if w.tv_grade in valid_grades and w.name != wrestler.name]
+        except ValueError:
+            # In case the TV grade is not in the standard list
+            logger.warning(f"Invalid TV grade: {wrestler.tv_grade}")
+            return [w for w in self.wrestlers if w.name != wrestler.name]
     
     def get_allies(self, wrestler: Wrestler) -> List[Wrestler]:
+        """Get all wrestlers that are allies of the given wrestler"""
         return [w for w in self.wrestlers if w.name in wrestler.allies]
     
     def get_rivals(self, wrestler: Wrestler) -> List[Wrestler]:
+        """Get all wrestlers that are rivals of the given wrestler"""
         return [w for w in self.wrestlers if w.name in wrestler.rivals]
     
     def update_wrestler_grade(self, wrestler_name: str, grade_type: str, new_value: Union[str, int]) -> str:
+        """Update a wrestler's TV or Grudge grade"""
         wrestler = self.get_wrestler(wrestler_name)
         if wrestler:
             old_value = wrestler.grudge_grade if grade_type.upper() == "GRUDGE" else wrestler.tv_grade

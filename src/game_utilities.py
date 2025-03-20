@@ -1,6 +1,12 @@
+"""
+Face to the Mat - Game Utilities
+This module contains utility functions and constants used throughout the game.
+"""
 import random
 import logging
-from typing import Dict, List, Tuple, Union, Optional, Callable
+import os
+import json
+from typing import Dict, List, Tuple, Union, Optional, Callable, Any
 
 # Set up logging
 logging.basicConfig(
@@ -33,19 +39,29 @@ PIN_RANGES = {
     'F': range(11, 12)     # 11 only
 }
 
+# Skill types for reference
+MENTAL_SKILLS = ["smart", "cheat", "mean"]
+PHYSICAL_SKILLS = ["agile", "strong", "powerful", "quick", "heavy"]
+SOCIAL_SKILLS = ["favorite", "helped"]
+SPECIALTY_SKILLS = ["grudge", "tv", "specialty", "object"]
+
 # Dice rolling functions
 def roll_d6() -> int:
+    """Roll a single 6-sided die"""
     return random.randint(1, 6)
 
 def roll_d66() -> int:
+    """Roll two 6-sided dice and combine for a d66 roll"""
     die_10s = random.randint(1, 6)
     die_1s = random.randint(1, 6)
     return die_10s * 10 + die_1s
 
 def get_pin_range(tv_grade: str) -> range:
+    """Get the kickout range for a specific TV grade"""
     return PIN_RANGES.get(tv_grade, range(11, 12))  # Default to F range if not found
 
 def get_space_type(position: int) -> str:
+    """Determine the type of a board space based on position"""
     if position == FINISHER_SPACE:
         return "FINISHER"
     elif position in PIN_SPACES:
@@ -58,6 +74,12 @@ def get_space_type(position: int) -> str:
         return "UNKNOWN"
 
 def compare_tv_grades(grade1: str, grade2: str) -> int:
+    """
+    Compare two TV grades
+    Returns:  1 if grade1 is better
+              0 if grades are equal
+             -1 if grade2 is better
+    """
     try:
         index1 = TV_GRADES.index(grade1)
         index2 = TV_GRADES.index(grade2)
@@ -73,6 +95,7 @@ def compare_tv_grades(grade1: str, grade2: str) -> int:
         return 0
 
 def format_log_message(message: str, category: str = "INFO") -> str:
+    """Format a message for the game log with a category prefix"""
     if category == "INFO":
         return message
     elif category == "ACTION":
@@ -85,9 +108,7 @@ def format_log_message(message: str, category: str = "INFO") -> str:
         return message
 
 def save_match_history(match_data: Dict, filename: str = "match_history.json") -> bool:
-    import json
-    import os
-    
+    """Save match data to a JSON history file"""
     try:
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(os.path.abspath(filename)), exist_ok=True)
@@ -111,13 +132,51 @@ def save_match_history(match_data: Dict, filename: str = "match_history.json") -
         logger.error(f"Error saving match history: {e}")
         return False
 
-# Highlight Reel chart references (stubs for now)
-# These will be implemented with actual charts in the future
+# Highlight Reel chart functions
 def get_highlight_reel_event(reel_id: str, roll: int) -> str:
-    # This is a stub - will be implemented with actual charts
+    """Get a highlight reel event based on the reel ID and roll"""
+    # These will be implemented with actual chart data in the future
+    highlight_reels = {
+        "G": {
+            11: "Gang/group turns on wrestler. Gain +2 Grudge.",
+            12: "Gang/group helps wrestler get the win.",
+            # Additional entries would go here
+        },
+        "M": {
+            11: "Manager turns on wrestler. Gain +2 Grudge.",
+            12: "Manager helps wrestler get the win.",
+            # Additional entries would go here
+        },
+        "V": {
+            11: "Valet turns on wrestler. Gain +2 Grudge.",
+            12: "Valet helps wrestler get the win.",
+            # Additional entries would go here
+        },
+    }
+    
+    if reel_id in highlight_reels and roll in highlight_reels[reel_id]:
+        return highlight_reels[reel_id][roll]
+    
     return f"Highlight Reel {reel_id} event (roll: {roll}). This feature will be implemented in a future update."
 
-# Wild Card chart references (stubs for now)
+# Wild Card chart functions
 def get_wild_card_event(card_type: str, roll: int) -> str:
-    # This is a stub - will be implemented with actual charts
+    """Get a wild card event based on the card type and roll"""
+    # These will be implemented with actual chart data in the future
+    wild_card_events = {
+        "Physical": {
+            11: "Wrestler injures their opponent. -1 TV for opponent.",
+            12: "Wrestler performs an amazing move. +1 TV.",
+            # Additional entries would go here
+        },
+        "Mental": {
+            11: "Wrestler outwits their opponent. Score 2 points.",
+            12: "Wrestler applies a technical hold. Opponent must roll to escape.",
+            # Additional entries would go here
+        },
+    }
+    
+    if card_type in wild_card_events and roll in wild_card_events[card_type]:
+        return wild_card_events[card_type][roll]
+    
     return f"Wild Card {card_type} event (roll: {roll}). This feature will be implemented in a future update."
