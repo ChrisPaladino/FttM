@@ -7,25 +7,7 @@ from game_logic import Game
 from game_utilities import logger, format_log_message
 
 class GameGUI:
-    """
-    Graphical User Interface for the Face to the Mat game.
-    
-    This class handles the display and user interaction for the wrestling game,
-    connecting to the game logic to update the display and process user actions.
-    
-    Attributes:
-        master (tk.Tk): The main Tkinter window
-        game (Game): The game logic instance
-        [other UI elements]
-    """
     def __init__(self, master, game):
-        """
-        Initialize the GameGUI with the master window and game instance.
-        
-        Args:
-            master: Tkinter root window
-            game: Game instance to connect to
-        """
         self.master = master
         self.game = game
         
@@ -59,12 +41,6 @@ class GameGUI:
         logger.info("GUI initialized")
 
     def add_to_log(self, message):
-        """
-        Add a message to the log text box.
-        
-        Args:
-            message: The message to add
-        """
         try:
             self.log_text.config(state=tk.NORMAL)
             self.log_text.insert(tk.END, message + "\n\n")
@@ -75,7 +51,6 @@ class GameGUI:
             logger.error(f"Error adding to log: {e}")
             # Don't show error message here to avoid potential infinite loop
     def clear_log(self):
-        """Clear the log text box."""
         try:
             self.log_text.config(state=tk.NORMAL)
             self.log_text.delete(1.0, tk.END)
@@ -85,15 +60,6 @@ class GameGUI:
             logger.error(f"Error clearing log: {e}")
             messagebox.showerror("Error", f"Could not clear log: {e}")
     def get_top_grudge_wrestlers(self, count=2):
-            """
-            Get the top wrestlers by grudge grade, excluding those already in use.
-            
-            Args:
-                count: Number of wrestlers to return
-                
-            Returns:
-                List of top grudge wrestlers
-            """
             try:
                 involved_wrestlers = set([
                     self.favored_var.get(),
@@ -115,7 +81,6 @@ class GameGUI:
                 return []
 
     def play_turn(self):
-        """Play a turn in the game."""
         try:
             if not self.game.favored_wrestler or not self.game.underdog_wrestler:
                 self.add_to_log("Please select wrestlers to begin the game.")
@@ -135,7 +100,6 @@ class GameGUI:
             messagebox.showerror("Error", f"Error during turn: {e}")
 
     def post_match_roll(self):
-        """Perform a post-match roll."""
         try:
             winner = messagebox.askquestion("Winner", "Did the Face win?")
             result = self.game.post_match_roll("Face" if winner == "yes" else "Heel")
@@ -146,7 +110,6 @@ class GameGUI:
             messagebox.showerror("Error", f"Error in post-match roll: {e}")
 
     def pre_match_roll(self):
-        """Perform a pre-match roll."""
         try:
             result = self.game.pre_match_roll()
             self.add_to_log(result)
@@ -156,7 +119,6 @@ class GameGUI:
             messagebox.showerror("Error", f"Error in pre-match roll: {e}")
 
     def set_in_control(self):
-        """Set which wrestler is in control."""
         try:
             control = self.in_control_var.get()
             if control == "Favored":
@@ -170,7 +132,6 @@ class GameGUI:
             logger.error(f"Error setting in control: {e}")
             messagebox.showerror("Error", f"Could not set in control: {e}")
     def setup_hot_box(self):
-            """Set up the Hot Box UI panel."""
             hot_box_frame = ttk.LabelFrame(self.master, text="Hot Box", padding="10")
             hot_box_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=10, pady=10)
 
@@ -222,7 +183,6 @@ class GameGUI:
             ttk.Button(hot_box_frame, text="Update Hot Box", command=self.update_hot_box).grid(row=3, column=2, columnspan=2, pady=5)
 
     def update_hot_box(self):
-        """Update the game's Hot Box with the selected wrestlers."""
         try:
             self.game.setup_hot_box(
                 favored_ally_name=self.favored_ally_var.get() or None,
@@ -238,7 +198,6 @@ class GameGUI:
             logger.error(f"Error updating Hot Box: {e}")
             messagebox.showerror("Error", f"Could not update Hot Box: {e}")
     def setup_match_controls(self):
-            """Set up the match control buttons."""
             control_frame = ttk.Frame(self.master, padding="10")
             control_frame.grid(row=1, column=0, columnspan=3, sticky="ew")
 
@@ -256,12 +215,6 @@ class GameGUI:
             ttk.Button(control_frame, text="Set Control", command=self.set_in_control).pack(side="left", padx=5)
 
     def set_position(self, wrestler_type):
-        """
-        Set a wrestler's position on the match track.
-        
-        Args:
-            wrestler_type: Either "Favored" or "Underdog"
-        """
         try:
             position = int(self.position_var.get())
             if 0 <= position <= 15:
@@ -281,7 +234,6 @@ class GameGUI:
             messagebox.showerror("Error", f"Could not set position: {e}")
 
     def setup_grade_update_controls(self):
-        """Set up the controls for updating wrestler grades."""
         update_frame = ttk.Frame(self.master, padding="10")
         update_frame.grid(row=3, column=0, columnspan=3, sticky="ew")
 
@@ -300,7 +252,6 @@ class GameGUI:
         ttk.Button(update_frame, text="Update Grade", command=self.update_grade).grid(row=0, column=5, padx=5)
 
     def setup_gui(self):
-            """Set up the main GUI components."""
             self.master.title("Face to the Mat")
             self.master.geometry("825x725")
             self.master.minsize(825, 725)  # Set minimum size
@@ -368,12 +319,6 @@ class GameGUI:
             self.update_display()
 
     def show_match_end_dialog(self, result):
-            """
-            Show a dialog with the match result.
-            
-            Args:
-                result: Text describing the match result
-            """
             end_dialog = tk.Toplevel(self.master)
             end_dialog.title("Match Result")
             
@@ -384,7 +329,6 @@ class GameGUI:
             ok_button.pack(pady=10)
 
     def update_board(self):
-        """Update the game board visualization."""
         self.board_canvas.delete("all")
         space_height = 25
         space_width = 25
@@ -407,7 +351,6 @@ class GameGUI:
             self.board_canvas.create_oval(space_width-5-piece_size, underdog_y-piece_size/2, space_width-5, underdog_y+piece_size/2, fill="red")
 
     def update_card_display(self):
-        """Update the display of the current card."""
         if self.game.current_card:
             card = self.game.current_card
             card_text = f"Move Type: {card.type}\n"
@@ -423,7 +366,6 @@ class GameGUI:
             self.card_label.config(text="No card drawn yet")
 
     def update_display(self):
-        """Update all display elements."""
         self.update_wrestler_info()
         self.update_board()
         self.update_card_display()
@@ -431,7 +373,6 @@ class GameGUI:
         self.update_hot_box_display()
 
     def update_grade(self):
-        """Update a wrestler's TV or Grudge grade."""
         try:
             wrestler_name = self.update_wrestler_var.get()
             if not wrestler_name:
@@ -450,54 +391,23 @@ class GameGUI:
             messagebox.showerror("Error", f"Could not update grade: {e}")
 
     def update_grudge1(self, event):
-        """
-        Event handler when grudge wrestler 1 is selected.
-        
-        Args:
-            event: Event object
-        """
         self.update_hot_box_dropdowns()
 
     def update_grudge2(self, event):
-        """
-        Event handler when grudge wrestler 2 is selected.
-        
-        Args:
-            event: Event object
-        """
         self.update_hot_box_dropdowns()
 
     def update_hot_box_display(self):
-        """Update the Hot Box information display."""
         # This function would update any visual representation of the Hot Box
         # For now, we're just ensuring the dropdowns are updated
         self.update_hot_box_dropdowns()
 
     def update_favored_ally(self, event):
-        """
-        Event handler when favored ally is selected.
-        
-        Args:
-            event: Event object
-        """
         self.update_hot_box_dropdowns()
 
     def update_favored_foe(self, event):
-        """
-        Event handler when favored foe is selected.
-        
-        Args:
-            event: Event object
-        """
         self.update_hot_box_dropdowns()
 
     def update_favored_wrestler(self, event):
-        """
-        Event handler when favored wrestler is selected.
-        
-        Args:
-            event: Event object
-        """
         try:
             selected_name = self.favored_var.get()
             wrestler = self.game.wrestler_manager.get_wrestler(selected_name)
@@ -511,7 +421,6 @@ class GameGUI:
             messagebox.showerror("Error", f"Could not set favored wrestler: {e}")
 
     def update_hot_box_dropdowns(self):
-            """Update all dropdowns in the Hot Box."""
             try:
                 wrestler_names = sorted([w.name for w in self.game.wrestlers])
                 
@@ -535,7 +444,6 @@ class GameGUI:
                 # Don't show message box here as this might be called frequently
 
     def update_in_control_display(self):
-        """Update the display of which wrestler is in control."""
         if self.game.in_control == self.game.favored_wrestler:
             control_text = "Favored"
         elif self.game.in_control == self.game.underdog_wrestler:
@@ -545,20 +453,12 @@ class GameGUI:
         self.in_control_var.set(control_text)
 
     def update_underdog_ally(self, event):
-        """Event handler when underdog ally is selected."""
         self.update_hot_box_dropdowns()
 
     def update_underdog_foe(self, event):
-        """Event handler when underdog foe is selected."""
         self.update_hot_box_dropdowns()
 
     def update_underdog_wrestler(self, event):
-            """
-            Event handler when underdog wrestler is selected.
-            
-            Args:
-                event: Event object
-            """
             try:
                 selected_name = self.underdog_var.get()
                 wrestler = self.game.wrestler_manager.get_wrestler(selected_name)
@@ -572,7 +472,6 @@ class GameGUI:
                 messagebox.showerror("Error", f"Could not set underdog wrestler: {e}")
 
     def update_wrestler_dropdowns(self):
-        """Update all wrestler selection dropdowns."""
         try:
             wrestler_names = sorted([w.name for w in self.game.wrestlers])
             if self.favored_dropdown:
@@ -588,7 +487,6 @@ class GameGUI:
             messagebox.showerror("Error", f"Could not update wrestler dropdowns: {e}")
 
     def update_wrestler_info(self):
-        """Update the display of wrestler information."""
         info_text = ""
         for wrestler, role in [(self.game.favored_wrestler, "Favored"), (self.game.underdog_wrestler, "Underdog")]:
             if wrestler:

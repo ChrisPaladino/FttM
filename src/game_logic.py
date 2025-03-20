@@ -11,25 +11,7 @@ from game_utilities import (
 )
 
 class Game:
-    """
-    The main game class for Face to the Mat.
-    
-    This class orchestrates the match, handling the game state, card draws,
-    wrestler interactions, and scoring.
-    
-    Attributes:
-        in_control_counter (int): Counter for tracking consecutive in-control turns
-        in_control (Optional[Wrestler]): Currently in-control wrestler, if any
-        favored_wrestler (Optional[Wrestler]): The favored (expected to win) wrestler
-        underdog_wrestler (Optional[Wrestler]): The underdog wrestler
-        wrestlers (List[Wrestler]): List of all available wrestlers
-        deck (List[Card]): Current deck of cards
-        discard_pile (List[Card]): Cards that have been played
-        current_card (Optional[Card]): The currently drawn card
-        game_over (bool): Whether the match has ended
-    """
     def __init__(self):
-        """Initialize a new game."""
         self.in_control_counter = 0
         self.in_control = None
         self.favored_wrestler = None
@@ -54,15 +36,6 @@ class Game:
         logger.info("Game initialized")
 
     def attempt_finisher(self, wrestler: Wrestler) -> str:
-        """
-        Attempt a finishing move with the given wrestler.
-        
-        Args:
-            wrestler: The wrestler attempting the finisher
-            
-        Returns:
-            str: A description of the attempt result
-        """
         if not wrestler.finisher:
             return f"{wrestler.name} doesn't have a finisher move defined."
         
@@ -80,12 +53,6 @@ class Game:
         return result
 
     def attempt_pin(self) -> str:
-        """
-        Attempt a pin with the wrestler who is furthest along the board.
-        
-        Returns:
-            str: A description of the pin attempt result
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot attempt pin: wrestlers not set."
             
@@ -109,12 +76,6 @@ class Game:
         return result
 
     def play_turn(self) -> str:
-        """
-        Play a turn in the match by drawing a card and resolving its effects.
-        
-        Returns:
-            str: A description of the turn's events
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Please select wrestlers to begin the game."
             
@@ -166,15 +127,6 @@ class Game:
         return turn_result
 
     def post_match_roll(self, winner: str) -> str:
-        """
-        Perform a post-match roll to determine storyline event.
-        
-        Args:
-            winner: "Face" or "Heel" indicating who won the match
-            
-        Returns:
-            str: Description of the post-match event
-        """
         d6_roll = roll_d6()
         d66_roll = roll_d66()
         
@@ -187,12 +139,6 @@ class Game:
                 return f"Post-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Heel won. Use Highlight Reel 'U'"
 
     def pre_match_roll(self) -> str:
-        """
-        Perform a pre-match roll to determine storyline event.
-        
-        Returns:
-            str: Description of the pre-match event
-        """
         d6_roll = roll_d6()
         d66_roll = roll_d66()
         
@@ -202,15 +148,6 @@ class Game:
             return f"Pre-Match: Rolled d6: {d6_roll}, d66: {d66_roll}. Use Highlight Reel 'R'"
 
     def resolve_card(self, card: Card) -> str:
-        """
-        Determine the outcome of a drawn card.
-        
-        Args:
-            card: The card to resolve
-            
-        Returns:
-            str: Description of the card's resolution
-        """
         result = f"Card drawn: {card.type} ({'Control' if card.control else 'No Control'})"
         
         # Handle in-control cards first
@@ -238,20 +175,13 @@ class Game:
             return result + "\n" + self.resolve_signature_card(card)
         elif card_type == "ref bump":
             return result + "\n" + "Ref Bump card drawn. This feature will be implemented in a future update."
+        elif card_type == "title holder":
+            return result + "\n" + self.resolve_title_holder_card(card)
         else:
             # Skill-specific cards (Agile, Strong, etc.)
             return result + "\n" + self.resolve_skill_card(card)
 
     def resolve_grudge_card(self, card: Card) -> str:
-        """
-        Resolve a Grudge card by comparing wrestlers' grudge grades.
-        
-        Args:
-            card: The Grudge card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve card: wrestlers not set."
             
@@ -271,15 +201,6 @@ class Game:
         return result
 
     def resolve_highlight_reel(self, card: Card) -> str:
-        """
-        Resolve a Highlight Reel card that references special events.
-        
-        Args:
-            card: The Highlight Reel card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         # This is a stub to be expanded with actual highlight reel mechanics
         if card.text:
             result = f"Highlight Reel card: {card.text}\n"
@@ -289,15 +210,6 @@ class Game:
             return "Highlight Reel card drawn, but no text specified."
 
     def resolve_in_control_card(self, card: Card) -> str:
-        """
-        Resolve a card when a wrestler is in control.
-        
-        Args:
-            card: The card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.in_control:
             return "No wrestler is in control. Cannot resolve in-control card."
             
@@ -305,15 +217,6 @@ class Game:
         return result + self.move_wrestler(self.in_control, card)
     
     def resolve_signature_card(self, card: Card) -> str:
-        """
-        Resolve a Signature card, which allows a wrestler to use a signature move.
-        
-        Args:
-            card: The Signature card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if self.in_control and self.in_control.last_card_scored:
             roll = roll_d6()
             self.in_control.score(roll)
@@ -322,15 +225,6 @@ class Game:
             return "No wrestler eligible for Signature move. No points scored."
 
     def resolve_skill_card(self, card: Card) -> str:
-        """
-        Resolve a skill-specific card (Agile, Strong, etc.).
-        
-        Args:
-            card: The skill card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve card: wrestlers not set."
             
@@ -354,16 +248,6 @@ class Game:
         return result
 
     def resolve_specialty_card(self, card: Card, in_control_wrestler: Optional[Wrestler] = None) -> str:
-        """
-        Resolve a Specialty card, which allows wrestlers to use their specialty moves.
-        
-        Args:
-            card: The Specialty card to resolve
-            in_control_wrestler: The wrestler in control (if any)
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve card: wrestlers not set."
             
@@ -390,16 +274,6 @@ class Game:
             return result + "Neither wrestler has a Specialty defined. No points scored."
 
     def resolve_submission_card(self, card: Card, wrestler: Wrestler) -> str:
-        """
-        Resolve a Submission card, which allows a wrestler to apply a submission hold.
-        
-        Args:
-            card: The Submission card to resolve
-            wrestler: The wrestler applying the submission
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not wrestler:
             return "Cannot resolve submission: wrestler not specified."
             
@@ -427,15 +301,6 @@ class Game:
         return result
 
     def resolve_test_of_strength(self, card: Card) -> str:
-        """
-        Resolve a Test of Strength card, which is a special contest between wrestlers.
-        
-        Args:
-            card: The Test of Strength card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve card: wrestlers not set."
             
@@ -481,15 +346,6 @@ class Game:
         return result
 
     def resolve_tiebreaker(self, card: Card) -> str:
-        """
-        Resolve a tiebreaker when both wrestlers can perform a move.
-        
-        Args:
-            card: The card being resolved
-            
-        Returns:
-            str: Description of the tiebreaker resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve tiebreaker: wrestlers not set."
             
@@ -503,15 +359,6 @@ class Game:
         return self.move_wrestler(self.favored_wrestler, card)
 
     def resolve_trailing_card(self, card: Card) -> str:
-        """
-        Resolve a Trailing card, which benefits the wrestler who is behind.
-        
-        Args:
-            card: The Trailing card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve card: wrestlers not set."
             
@@ -527,15 +374,6 @@ class Game:
                 return "Neither wrestler is trailing. No points scored."
 
     def resolve_tv_card(self, card: Card) -> str:
-        """
-        Resolve a TV card by comparing wrestlers' TV grades.
-        
-        Args:
-            card: The TV card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         if not self.favored_wrestler or not self.underdog_wrestler:
             return "Cannot resolve card: wrestlers not set."
             
@@ -557,15 +395,6 @@ class Game:
         return result
 
     def resolve_wild_card(self, card: Card) -> str:
-        """
-        Resolve a Wild Card, which triggers a special event.
-        
-        Args:
-            card: The Wild Card to resolve
-            
-        Returns:
-            str: Description of the resolution
-        """
         # This is a stub to be expanded with actual wild card mechanics
         if card.text:
             result = f"Wild Card: {card.text}\n"
@@ -575,16 +404,6 @@ class Game:
             return "Wild Card drawn, but no text specified."
 
     def move_wrestler(self, wrestler: Wrestler, card: Card) -> str:
-        """
-        Move a wrestler based on the points from a card.
-        
-        Args:
-            wrestler: The wrestler to move
-            card: The card providing the points
-            
-        Returns:
-            str: Description of the move
-        """
         if not wrestler:
             return "Cannot move: wrestler not specified."
             
@@ -613,27 +432,13 @@ class Game:
         return result
 
     def set_wrestler_position(self, wrestler: Wrestler, position: int) -> None:
-        """
-        Set a wrestler's position on the match track.
-        
-        Args:
-            wrestler: The wrestler to move
-            position: The position to move to
-        """
         if wrestler:
             wrestler.position = min(max(0, position), 15)  # Ensure position is between 0 and 15
 
     def set_in_control(self, wrestler: Optional[Wrestler]) -> None:
-        """
-        Set which wrestler is in control.
-        
-        Args:
-            wrestler: The wrestler to set as in control, or None for neither
-        """
         self.in_control = wrestler
 
     def setup_game(self) -> None:
-        """Set up the game by loading/initializing resources."""
         # Load/refresh wrestlers
         self.wrestler_manager.load_wrestlers()
         self.wrestlers = self.wrestler_manager.wrestlers
@@ -659,30 +464,9 @@ class Game:
         logger.info("Game setup complete")
 
     def update_wrestler_grade(self, wrestler_name: str, grade_type: str, new_value: Union[str, int]) -> str:
-        """
-        Update a wrestler's TV or Grudge grade.
-        
-        Args:
-            wrestler_name: Name of the wrestler to update
-            grade_type: Either "TV" or "GRUDGE"
-            new_value: The new grade value
-            
-        Returns:
-            str: Result message
-        """
         return self.wrestler_manager.update_wrestler_grade(wrestler_name, grade_type, new_value)
 
     def get_top_grudge_wrestlers(self, count: int = 2, exclude: Optional[List[str]] = None) -> List[Wrestler]:
-        """
-        Get the top wrestlers by grudge grade, excluding specified wrestlers.
-        
-        Args:
-            count: Number of wrestlers to return
-            exclude: Names of wrestlers to exclude
-            
-        Returns:
-            List[Wrestler]: List of top wrestlers by grudge grade
-        """
         exclude = exclude or []
         wrestlers = [w for w in self.wrestlers if w.name not in exclude]
         return sorted(wrestlers, key=lambda w: w.grudge_grade, reverse=True)[:count]
@@ -692,15 +476,6 @@ class Game:
                      favored_foe_name: Optional[str] = None,
                      underdog_ally_name: Optional[str] = None,
                      underdog_foe_name: Optional[str] = None) -> None:
-        """
-        Set up the Hot Box with allies and foes.
-        
-        Args:
-            favored_ally_name: Name of the favored wrestler's ally
-            favored_foe_name: Name of the favored wrestler's foe
-            underdog_ally_name: Name of the underdog wrestler's ally
-            underdog_foe_name: Name of the underdog wrestler's foe
-        """
         # Clear existing hot box
         self.favored_ally = None
         self.favored_foe = None

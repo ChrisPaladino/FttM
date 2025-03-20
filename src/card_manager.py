@@ -4,20 +4,6 @@ import os
 from typing import Dict, List, Union, Optional, Tuple, Any
 
 class Card:
-    """
-    Represents a Fast Action Card (FAC) in the Face to the Mat game.
-    
-    Cards determine which moves can be performed and how many points are scored
-    during a wrestling match.
-    
-    Attributes:
-        id (int): Unique identifier for the card
-        control (bool): Whether this is an "in control" card
-        type (str): The card type (e.g., "Agile", "TV", "Grudge", etc.)
-        points (Union[int, float, str, Dict]): Points value or dict mapping TV grades to points
-        text (Optional[str]): Additional text description or special instructions
-        is_submission (bool): Whether this card represents a submission move
-    """
     def __init__(self, id: int, control: bool, type: str, 
                  points: Union[int, float, str, Dict, None] = None, 
                  text: Optional[str] = None):
@@ -29,15 +15,6 @@ class Card:
         self.is_submission = "Submission!" in (text or "")
 
     def get_points(self, tv_grade: Optional[str] = None) -> int:
-        """
-        Calculate the points value for this card, taking into account TV grade if applicable.
-        
-        Args:
-            tv_grade (Optional[str]): The TV grade to use for TV cards
-            
-        Returns:
-            int: The number of points for this card
-        """
         if isinstance(self.points, dict):  # TV card
             return self.points.get(tv_grade, 0)
         elif self.points == "d6":
@@ -47,29 +24,11 @@ class Card:
         return 0
     
     def __str__(self) -> str:
-        """String representation of the card."""
         return f"Card {self.id}: {self.type} ({'Control' if self.control else 'No Control'})"
 
 
 class CardManager:
-    """
-    Manages the deck of Fast Action Cards (FACs) for the Face to the Mat game.
-    
-    This class handles loading, shuffling, drawing, and managing the discard pile
-    for the card deck.
-    
-    Attributes:
-        deck (List[Card]): The current deck of cards
-        discard_pile (List[Card]): Cards that have been played
-        data_path (str): Path to the card data file
-    """
     def __init__(self, data_path: Optional[str] = None):
-        """
-        Initialize the CardManager with an empty deck and discard pile.
-        
-        Args:
-            data_path (Optional[str]): Path to the card data file. If None, uses default path.
-        """
         self.deck: List[Card] = []
         self.discard_pile: List[Card] = []
         
@@ -83,13 +42,6 @@ class CardManager:
         self.shuffle_deck()
     
     def load_deck(self) -> None:
-        """
-        Load the card deck from the JSON file.
-        
-        Raises:
-            FileNotFoundError: If the deck file is not found
-            json.JSONDecodeError: If the deck file contains invalid JSON
-        """
         try:
             with open(self.data_path, 'r') as f:
                 data = json.load(f)
@@ -102,17 +54,9 @@ class CardManager:
             self.deck = []
     
     def shuffle_deck(self) -> None:
-        """Shuffle the current deck of cards."""
         random.shuffle(self.deck)
     
     def draw_card(self) -> Optional[Card]:
-        """
-        Draw a card from the deck. If the deck is empty, shuffle the discard pile
-        back into the deck.
-        
-        Returns:
-            Optional[Card]: The drawn card, or None if no cards are available
-        """
         if not self.deck:
             if not self.discard_pile:
                 print("Error: No cards available even after reshuffling.")
@@ -132,31 +76,15 @@ class CardManager:
             return None
     
     def reset(self) -> None:
-        """Reset the card manager by returning all cards to the deck and shuffling."""
         self.deck.extend(self.discard_pile)
         self.discard_pile = []
         self.shuffle_deck()
     
     def get_card_types(self) -> List[str]:
-        """
-        Get a list of all unique card types in the deck.
-        
-        Returns:
-            List[str]: A list of card types
-        """
         all_cards = self.deck + self.discard_pile
         return list(set(card.type for card in all_cards))
     
     def get_cards_by_type(self, card_type: str) -> List[Card]:
-        """
-        Get all cards of a specific type.
-        
-        Args:
-            card_type (str): The type of card to find
-            
-        Returns:
-            List[Card]: A list of cards matching the specified type
-        """
         all_cards = self.deck + self.discard_pile
         return [card for card in all_cards if card.type.lower() == card_type.lower()]
 
@@ -164,18 +92,6 @@ class CardManager:
 # Functions for specific card type resolution
 
 def resolve_submission_card(card: Card, wrestler, opponent, d6_func=None) -> str:
-    """
-    Resolve a submission card, which can score multiple points until the hold is broken.
-    
-    Args:
-        card (Card): The submission card being played
-        wrestler: The wrestler performing the submission
-        opponent: The wrestler defending against the submission
-        d6_func (callable, optional): Function to roll a d6. Used for testing.
-        
-    Returns:
-        str: A description of what happened
-    """
     if d6_func is None:
         d6_func = lambda: random.randint(1, 6)
         
@@ -199,18 +115,6 @@ def resolve_submission_card(card: Card, wrestler, opponent, d6_func=None) -> str
     return result
 
 def resolve_test_of_strength(card: Card, face_wrestler, heel_wrestler, d6_func=None) -> str:
-    """
-    Resolve a Test of Strength card, which is a special type of contest between wrestlers.
-    
-    Args:
-        card (Card): The Test of Strength card being played
-        face_wrestler: The face (good guy) wrestler
-        heel_wrestler: The heel (bad guy) wrestler
-        d6_func (callable, optional): Function to roll a d6. Used for testing.
-        
-    Returns:
-        str: A description of what happened
-    """
     if d6_func is None:
         d6_func = lambda: random.randint(1, 6)
         
@@ -249,17 +153,6 @@ def resolve_test_of_strength(card: Card, face_wrestler, heel_wrestler, d6_func=N
     return result
 
 def resolve_helped_card(card: Card, wrestler, ally=None) -> str:
-    """
-    Resolve a Helped card, which involves outside help from an ally.
-    
-    Args:
-        card (Card): The Helped card being played
-        wrestler: The wrestler receiving help
-        ally: The wrestler providing the help (optional)
-        
-    Returns:
-        str: A description of what happened
-    """
     result = f"{wrestler.name} receives outside help"
     
     if ally:

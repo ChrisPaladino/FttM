@@ -24,23 +24,17 @@ Face to the Mat is a tabletop wrestling game that simulates professional wrestli
 
 ## Project Structure
 
-```
 /FTTM
     /data
         /gamedata
             fac_deck.json       # The action card deck used to resolve moves
         /wrestlers
             /img                # Folder for wrestler images
-            wrestlers.json      # Current wrestler data with stats and attributes
+            orig_wrestlers.json # Original (source) wrestler data for new leagues
+            wrestlers.json      # Current wrestler data updated as career progresses
     /docs
-        code refactoring summary and next steps.md
         developmentroadmap.md
-        game gui update plan.md
-                                # Plan for updating the GUI
-        gui update implementation steps.md
         Rulebook_v3.pdf         # Comprehensive game rules
-        architecture-diagram.svg
-        class-diagram.svg       # Visual representation of class relationships
     /src
         card_manager.py        # Card deck and card operations management
         game_gui.py            # The GUI implementation using Tkinter
@@ -50,11 +44,7 @@ Face to the Mat is a tabletop wrestling game that simulates professional wrestli
         new_wrestler_creation.py  # Script for creating new wrestlers
         wrestler_editor.py      # GUI for editing wrestler attributes
         wrestler_manager.py    # Wrestler data and operations management
-    /tests
-        test_card_manager.py   # Tests for card management functionality
-        test_utilities.py      # Helper functions for testing
     README.md                  # This file
-```
 
 ## Game Components
 
@@ -141,21 +131,6 @@ The game supports various match types:
 - Tournament and federation management
 - Wrestler ranking and pointing system
 - Contracts and retirement system
-
-## Testing
-
-Run the tests with:
-```
-python -m unittest discover tests
-```
-
-## Contributing
-
-Contributions are welcome! Please check the issues list or create a new issue to discuss proposed changes.
-
-## License
-
-[Your License Information Here]
 
 ---
 

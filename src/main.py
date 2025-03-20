@@ -13,11 +13,6 @@ from src.game_gui import GameGUI
 from src.game_utilities import logger
 
 def main():
-    """
-    Main entry point for the Face to the Mat application.
-    
-    Initializes the game and GUI, then starts the main event loop.
-    """
     # Set up logging
     logger.info("Starting Face to the Mat application")
     
@@ -62,7 +57,6 @@ def main():
     
     # Set up application closing handler
     def on_closing():
-        """Handler for when the application is closed."""
         logger.info("Application closing")
         # Perform any cleanup needed here
         root.destroy()
