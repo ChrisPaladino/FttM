@@ -503,6 +503,85 @@ class Game:
             tiebreaker_result = self._resolve_tiebreaker(card)
             return GameResult(True, result + tiebreaker_result.message)
 
+    def _resolve_tv_card(self, card: Card) -> GameResult:
+        """Resolve a TV card based on wrestler TV grades"""
+        if not self.favored_wrestler or not self.underdog_wrestler:
+            return GameResult(False, "Cannot resolve card: wrestlers not set.")
+            
+        favored_grade = self.favored_wrestler.tv_grade
+        underdog_grade = self.underdog_wrestler.tv_grade
+        
+        result = f"Comparing TV Grades: {self.favored_wrestler.name} ({favored_grade}) vs {self.underdog_wrestler.name} ({underdog_grade})\n"
+        
+        comparison = compare_tv_grades(favored_grade, underdog_grade)
+        
+        if comparison > 0:  # favored has better grade
+            movement_result = self._move_wrestler(self.favored_wrestler, card)
+            return GameResult(True, result + movement_result.message)
+        elif comparison < 0:  # underdog has better grade
+            movement_result = self._move_wrestler(self.underdog_wrestler, card)
+            return GameResult(True, result + movement_result.message)
+        else:  # equal grades
+            result += "TV Grades are equal. Using tiebreaker.\n"
+            tiebreaker_result = self._resolve_tiebreaker(card)
+            return GameResult(True, result + tiebreaker_result.message)
+
+    def _move_wrestler(self, wrestler: Wrestler, card: Card) -> GameResult:
+        """Move a wrestler based on card points and update the in-control wrestler"""
+        if not wrestler:
+            return GameResult(False, "Cannot move: wrestler not specified.")
+        
+        try:
+            # Determine points based on card type
+            if card.type.lower() == "tv":
+                points = card.get_points(wrestler.tv_grade)
+            elif card.type.lower() == "specialty":
+                points = wrestler.specialty_points
+            elif card.type.lower() == "signature":
+                points = roll_d6()
+            else:
+                points = card.get_points(wrestler.tv_grade)
+            
+            # Store original position for tracking
+            original_position = wrestler.position
+            
+            # Apply points and update position
+            wrestler.score(points)
+            
+            # Construct result message
+            result = f"{wrestler.name} used {card.type} "
+            if card.type.lower() == "specialty" and wrestler.specialty:
+                result += f"({wrestler.specialty.get('name', 'Unnamed Specialty')}) "
+            
+            result += f"and moved from position {original_position} to {wrestler.position} (+{points} points)"
+            
+            # Update control state if points were scored
+            if points > 0:
+                self.in_control = wrestler
+                wrestler.last_card_scored = True
+                result += f"\n{wrestler.name} is now in control."
+            
+            # Trigger event for wrestler movement
+            self._trigger_event(GameEvent.WRESTLER_MOVED, {
+                "wrestler": wrestler.name,
+                "old_position": original_position,
+                "new_position": wrestler.position,
+                "points": points,
+                "card_type": card.type
+            })
+            
+            return GameResult(True, result, {
+                "wrestler": wrestler.name,
+                "old_position": original_position,
+                "new_position": wrestler.position,
+                "points": points
+            })
+            
+        except Exception as e:
+            logger.error(f"Error moving wrestler: {e}")
+            self._trigger_event(GameEvent.ERROR_OCCURRED, {"error": str(e)})
+            return GameResult(False, f"Error moving wrestler: {e}")
+
     def _resolve_helped_card(self, card: Card) -> GameResult:
         """Resolve a Helped card based on allies in the Hot Box"""
         if not self.favored_wrestler or not self.underdog_wrestler:
@@ -840,6 +919,28 @@ class Game:
         result = f"Tiebreaker: Wrestlers are tied. {self.favored_wrestler.name} wins as the favored wrestler.\n"
         movement_result = self._move_wrestler(self.favored_wrestler, card)
         return GameResult(True, result + movement_result.message)
+
+    def _resolve_trailing_card(self, card: Card) -> GameResult:
+        """Resolve a Trailing card for the wrestler with lower position"""
+        if not self.favored_wrestler or not self.underdog_wrestler:
+            return GameResult(False, "Cannot resolve card: wrestlers not set.")
+            
+        if self.favored_wrestler.position < self.underdog_wrestler.position:
+            result = f"{self.favored_wrestler.name} is trailing and can use the Trailing card.\n"
+            movement_result = self._move_wrestler(self.favored_wrestler, card)
+            return GameResult(True, result + movement_result.message)
+        elif self.underdog_wrestler.position < self.favored_wrestler.position:
+            result = f"{self.underdog_wrestler.name} is trailing and can use the Trailing card.\n"
+            movement_result = self._move_wrestler(self.underdog_wrestler, card)
+            return GameResult(True, result + movement_result.message)
+        else:
+            # If positions are equal, the underdog is considered trailing
+            if self.favored_wrestler.position == self.underdog_wrestler.position:
+                result = f"Wrestlers are tied. {self.underdog_wrestler.name} can use the Trailing card as the underdog.\n"
+                movement_result = self._move_wrestler(self.underdog_wrestler, card)
+                return GameResult(True, result + movement_result.message)
+            else:
+                return GameResult(True, "Neither wrestler is trailing. No points scored.")
 
     def _resolve_tiebreaker_without_move(self, card: Card) -> Wrestler:
         """Determine the winner of a tiebreaker without moving them"""
