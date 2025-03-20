@@ -50,7 +50,7 @@ class Game:
         self.game_over = False
         
         # Initialize managers
-        self.wrestler_manager = WrestlerManager(game=self)
+        self.wrestler_manager = WrestlerManager()
         self.card_manager = CardManager()
         self.wrestlers = self.wrestler_manager.wrestlers
         
