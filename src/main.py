@@ -1,3 +1,7 @@
+"""
+Face to the Mat - Main Application
+Entry point for the wrestling simulation game
+"""
 import tkinter as tk
 import os
 import sys
@@ -13,6 +17,7 @@ from src.game_gui import GameGUI
 from src.game_utilities import logger
 
 def main():
+    """Main application entry point"""
     # Set up logging
     logger.info("Starting Face to the Mat application")
     
@@ -58,7 +63,7 @@ def main():
     # Set up application closing handler
     def on_closing():
         logger.info("Application closing")
-        # Perform any cleanup needed here
+        # Save any unsaved data here if needed
         root.destroy()
     
     root.protocol("WM_DELETE_WINDOW", on_closing)
