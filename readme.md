@@ -1,4 +1,4 @@
-# 🥊 Face to the Mat
+# 🥊 Face to the Mat v4
 
 *A Python-based digital adaptation of the classic pro wrestling card game.*
 
