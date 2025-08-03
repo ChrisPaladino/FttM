@@ -27,6 +27,15 @@ Each wrestler has:
 
 - Represents feud intensity. Can be positive or negative.
 
+### Helped Wrestlers
+
+- As promoter of yoru federation, you'll need to decide which of yoru wrestlers will get outside help in their rin adventures and what kind of help that will be. There are three kinds of help in Face to the Mat: gangs or groups (G); managers (M); or valets (V).
+
+### Heels and Faces
+
+- You will also want to decide which of your wrestlers are good guys (Faces) and bad guys (Heels). Generally speaking, wrestliers with the Favorite Skill are considered Faces, while those with the Cheat Skill are considered Heels. There are exepctions of course, and you should use discretion here.
+- Some wrestlers will be niether Face or Heel. THey may defelop, or simply be an ambiguious character. For the purposes of the game, however, every match as a Face and Heel. If they are both Faces or Heels, then the wrester with the Higher Grudge Grade will be considered the Heel for this match.
+
 ### Skills / Qualities (12 total)
 
 - AGILE  
@@ -58,6 +67,7 @@ These symbols are specific to each wrestler card and vary by individual.
 1. **Wrestler Assignment**
     - One wrestler is the **Favored**.
     - One is the **Underdog**.
+    - Note that these assignments are independant of Face or Heel status.
 2. **HOT BOX Slots (Six Total)**
     - Favored wrestler’s ally and foe  
     - Underdog wrestler’s ally and foe  
@@ -100,7 +110,12 @@ These symbols are specific to each wrestler card and vary by individual.
 ### Resolution Process
 
 1. Draw FAC  
-2. Determine FAC type  
+2. Determine FAC type
+
+  - There are five types of FACs: Skill-Specific; TV Move; Wild Card; Highlight Reel or Signature
+  - A Skill-specific card calls for certain skills to come into play. If one of the wresters has that skill, then the wrestler scores the points indicated and moves forward. If Both wrestlers have the skill, then utilize the tie-breaker procedure laid out below. If neither wrestler has the skill then ignore the card and redraw.
+  - If the FAC has In Control, then if a wrestler scored on the previous FAC, he is considered in control. If the In Control wrestler gets a Free Shot. If he has the skill on that card, they automatically score points. If they do not, then draw another card, and the opponent (not in control) gets a Free Shot. If they have the skill on taht card then they will automatically score points. If they do not have the skill, then it's a non-scoring card, and you should draw the next FAC.
+  
 3. Compare attributes or qualities  
 4. Apply tiebreakers (if needed)  
 5. Calculate points  
