@@ -224,8 +224,16 @@ class Game:
     def resolve_card(self, card):
         result = f"Card drawn: {card.type} ({'Control' if card.control else 'No Control'})\n"
 
-        if card.control and self.in_control:
-            return result + self.resolve_in_control_card(card)
+        if card.control:
+            favored_has_skill = self.favored_wrestler.can_use_skill(
+                card.type, self.favored_wrestler.position
+            )
+            underdog_has_skill = self.underdog_wrestler.can_use_skill(
+                card.type, self.underdog_wrestler.position
+            )
+            return result + self.resolve_wrestler_in_control(
+                card, favored_has_skill, underdog_has_skill
+            )
 
         if card.type == "TV":
             return result + self.resolve_tv_card(card)
@@ -254,10 +262,6 @@ class Game:
         
         return result
 
-    def resolve_in_control_card(self, card):
-        result = f"In-control card ({card.type}) for {self.in_control.name}:\n"
-        return result + self.move_wrestler(self.in_control, card)
-    
     def resolve_signature_card(self, card):
         if self.in_control and self.in_control.last_card_scored:
             roll = self.roll_d6()
